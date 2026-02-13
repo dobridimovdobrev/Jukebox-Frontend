@@ -1,0 +1,92 @@
+@use "@/styles/abstracts/variables" as *;
+
+.users {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  &__header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  &__header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  &__filters {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+
+    .settings-search {
+      flex: 1;
+      min-width: 150px;
+    }
+  }
+}
+
+// Username cell
+.user-username {
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+// Email cell
+.user-email {
+  font-size: 0.82rem;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Birthday cell
+.user-birthday {
+  white-space: nowrap;
+  font-size: 0.8rem;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .users {
+    &__header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.5rem;
+    }
+
+    &__header-left {
+      justify-content: space-between;
+    }
+
+    &__header-right {
+      flex-direction: column;
+
+      .btn-action {
+        width: 100%;
+      }
+    }
+
+    &__filters {
+      flex-direction: column;
+
+      .settings-search {
+        width: 100%;
+        min-width: auto;
+      }
+    }
+  }
+}

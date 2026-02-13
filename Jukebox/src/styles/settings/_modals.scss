@@ -1,0 +1,79 @@
+@use "@/styles/abstracts/variables" as *;
+// reusable styles of modals in settings backoffice
+.settings-content {
+  // overlay centered of delete modal
+  .delete-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  // delete modal for crud tables
+  .delete-modal {
+    background: linear-gradient(145deg, #1a1a2e 0%, #16213e 100%);
+    border: 2px solid $primary;
+    border-radius: 12px;
+    min-width: 320px;
+    max-width: 380px;
+    padding: 1rem 1.25rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    // delete modal body
+    &__body {
+      margin-bottom: 0.75rem;
+    }
+    //delete modal footer
+    &__footer {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+      padding-top: 0.5rem;
+      border-top: 1px solid rgba($primary, 0.3);
+      // delete modal buttons display
+      .btn-action {
+        flex: 1;
+        justify-content: center;
+      }
+    }
+  }
+  // delete modal buttons
+  .delete-confirm {
+    text-align: center;
+    padding: 0.5rem 0;
+    // delete modal icon
+    &__icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.75rem;
+      filter: drop-shadow(0 0 8px rgba(220, 53, 69, 0.4));
+    }
+    // delete modal message
+    &__message {
+      color: $gold;
+      font-size: 1rem;
+      margin-bottom: 0.25rem;
+      font-weight: 500;
+    }
+    // delete modal message
+    &__submessage {
+      color: rgba($gold, 0.6);
+      font-size: 0.8rem;
+      max-width: 280px;
+      margin: 0 auto;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+  }
+  // delete modal responsive
+  @media (max-width: 768px) {
+    .delete-modal {
+      min-width: auto;
+      width: 95vw;
+      padding: 1rem;
+    }
+  }
+}

@@ -1,0 +1,92 @@
+@use "@/styles/abstracts/variables.scss" as *;
+
+// insert coins container
+.insert-coins-box {
+  width: 228px;
+  height: 155px;
+  perspective: 1500px;
+}
+
+// insert coins with rotate 180 degree
+.insert-coins {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.7s ease;
+  transform-style: preserve-3d;
+
+  // rotation class added to the component state
+  &.flipped {
+    transform: rotateY(180deg);
+  }
+
+  //front and back sides
+  &__front,
+  &__back {
+    position: absolute;
+    width: 224px;
+    height: 155px;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+  }
+
+  //front insert coins image
+  &__front {
+    transform: rotateY(0deg);
+  }
+
+  &__image {
+    border-bottom-right-radius: 18px;
+    border-bottom-left-radius: 13px;
+  }
+
+  //back logo image
+  &__back {
+    transform: rotateY(180deg);
+  }
+
+  // insert coins display
+  &__display {
+    position: absolute;
+    top: 47px;
+    left: 87px;
+    transform: translateX(-50%);
+    width: 146px;
+    height: 46px;
+    background: linear-gradient(180deg, #1a3d1a 0%, #0d260d 100%);
+    border: 2px solid #2d5a2d;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+      inset 0 2px 4px rgba(0, 0, 0, 0.5),
+      0 0 8px rgba(50, 205, 50, 0.3);
+  }
+
+  // coins number
+  &__count {
+    font-family: "Courier New", monospace;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #32cd32;
+    text-shadow:
+      0 0 7px #32cd32,
+      0 0 14px rgba(50, 205, 50, 0.1);
+  }
+
+  // transparent button
+  &__button {
+    position: absolute;
+    top: 50px;
+    right: 18px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+}

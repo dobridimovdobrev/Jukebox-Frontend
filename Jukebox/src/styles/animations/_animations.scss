@@ -1,0 +1,75 @@
+@use "@/styles/abstracts/variables" as *;
+
+//shake (used in JukeboxLayout)
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-10px);
+  }
+  40% {
+    transform: translateX(10px);
+  }
+  60% {
+    transform: translateX(-10px);
+  }
+  80% {
+    transform: translateX(10px);
+  }
+}
+
+//quiz shake (used in QuizCoins)
+@keyframes quiz-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-8px);
+  }
+  40% {
+    transform: translateX(8px);
+  }
+  60% {
+    transform: translateX(-8px);
+  }
+  80% {
+    transform: translateX(8px);
+  }
+}
+
+// logo glow effect (used in Header)
+@keyframes logo-glow {
+  0% {
+    text-shadow: 0 0 4px rgba($primary, 0.3);
+  }
+  100% {
+    text-shadow: 0 0 8px rgba($primary, 0.5);
+  }
+}
+
+//pulse animation (used in Header) for the title
+@keyframes pulse-glow {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow: 0 0 10px $primary;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.2);
+    box-shadow: 0 0 20px $primary, 0 0 30px rgba($primary, 0.5);
+  }
+}
+
+//pulse ring expand (used in Header)
+@keyframes pulse-expand {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0;
+  }
+}

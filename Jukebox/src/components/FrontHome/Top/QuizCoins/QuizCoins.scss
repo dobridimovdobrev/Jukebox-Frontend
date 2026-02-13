@@ -1,0 +1,70 @@
+@use "@/styles/abstracts/variables" as *;
+@use "@/styles/animations/animations" as *;
+//quiz coins jukebox
+.quiz-coins {
+  width: 16rem;
+  margin-left: 1rem;
+  border: 1px solid $primary;
+  border-radius: 6px;
+  overflow: hidden;
+
+  &.shake {
+    animation: quiz-shake 0.5s ease;
+  }
+  //title box
+  &__title-box {
+    background: rgba($info, 0.6);
+    width: 100%;
+    border-bottom: 1px solid $primary;
+  }
+  //title quiz
+  &__title {
+    color: $secondary;
+    padding: 4px 0;
+    text-shadow:
+      0 0 20px $primary,
+      0 0 25px rgba($primary, 0.5),
+      0 0 30px rgba($primary, 0.3);
+  }
+  //description box
+  &__descritpion-box {
+    background-color: rgba(#1e1d18, 0.8);
+  }
+  //description quiz
+  &__description {
+    color: $gold;
+    font-style: italic;
+    padding: 0 6px;
+    margin-top: 0.7rem;
+    font-size: 1.3rem;
+  }
+  //button box
+  &__button-box {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background: rgba($info, 0.6);
+    border-top: 1px solid $primary;
+  }
+  //button quiz
+  &__button {
+    border-radius: 3px;
+    font-weight: 700;
+    color: $secondary;
+    border-color: $primary;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    text-shadow:
+      0 0 20px $primary,
+      0 0 25px rgba($primary, 0.5),
+      0 0 30px rgba($primary, 0.3);
+    transition: background-color 0.2s, box-shadow 0.2s, color 0.2s;
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgba($primary, 0.5);
+      box-shadow: 0 0 14px rgba($primary, 0.6);
+      color: $gold;
+    }
+  }
+}

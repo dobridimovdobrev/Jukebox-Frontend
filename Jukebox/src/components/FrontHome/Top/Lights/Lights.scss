@@ -1,0 +1,27 @@
+@use "@/styles/abstracts/variables" as *;
+.lights {
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: .8rem;
+  margin-bottom: .5rem;
+  padding: 0.4rem;
+
+  &__bulb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #af8445;
+    border: 1px solid #555;
+    transition: all 0.3s ease;
+
+    &--on {
+      opacity: .7;
+      background: rgb(253, 201, 102);
+      border-color: rgb(253, 201, 102);
+      box-shadow:
+        0 0 3px rgb(242, 180, 59),
+        0 0 6px rgb(242, 180, 59),
+        0 0 9px rgb(242, 180, 59, .5);
+    }
+  }
+}

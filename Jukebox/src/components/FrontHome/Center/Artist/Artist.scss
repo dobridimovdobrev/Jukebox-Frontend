@@ -1,0 +1,109 @@
+@use "@/styles/abstracts/variables.scss" as *;
+
+.artist {
+  width: 100%;
+  position: relative;
+  padding: 0 1rem;
+  
+  // swiper
+  &__swiper {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  // indipendetn arrows for swiper carousel
+  &__nav-prev,
+  &__nav-next {
+    position: absolute;
+    top: 44%;
+    transform: translateY(-50%);
+    z-index: 10;
+    cursor: pointer;
+    color: $artist;
+    // font size of arrows
+    &::after {
+      font-size: 2.2rem;
+    }
+    // arrows hover color
+    &:hover {
+      color: $artist;
+    }
+
+    /* &.swiper-button-disabled {
+      opacity: 0.7;
+      cursor: default;
+    } */
+  }
+    // arrow left
+  &__nav-prev {
+    left: 0;
+    &::after {
+      content: '❮';
+    }
+  }
+    // arrow right
+  &__nav-next {
+    right: 0;
+    &::after {
+      content: '❯';
+    }
+  }
+  
+   // artist box
+  &__box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    cursor: pointer;
+
+    &:hover,
+    &--active {
+      .artist__image {
+        border-color: rgba($highlight, 0.7);
+        box-shadow: 0 0 12px rgba($highlight, 0.8);
+      }
+
+      .artist__name {
+        background-color: rgba($highlight, 0.7);
+        box-shadow: 0 0 8px rgba($highlight, 0.6);
+      }
+    }
+  }
+
+  &__loading,
+  &__empty {
+    text-align: center;
+    color: $gold;
+    padding: 1rem;
+    font-size: 0.9rem;
+  }
+
+  // artist image
+  &__image {
+    width: 4.8rem;
+    height: 4.8rem;
+    object-fit: cover;
+    object-position: center top;
+    border: 3px solid $artist;
+    border-radius: 50%;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  // artist name
+  &__name {
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-align: center;
+    color: $special;
+    background-color: $artist;
+    border-radius: 3px;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    max-width: 13ch;
+    padding: 0 0.3rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+      

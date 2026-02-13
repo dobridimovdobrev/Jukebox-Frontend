@@ -1,0 +1,17 @@
+@use "@/styles/abstracts/variables" as *;
+
+// custom scrollbar for dark theme
+@mixin custom-scrollbar($width: 6px) {
+  &::-webkit-scrollbar {
+    width: $width;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $primary;
+    border-radius: 3px;
+  }
+}

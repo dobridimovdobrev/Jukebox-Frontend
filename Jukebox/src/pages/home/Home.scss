@@ -1,0 +1,56 @@
+@use "@/styles/abstracts/variables.scss" as *;
+// jukebox layout for front of Home page
+.jukebox-layout__front {
+  display: flex;
+  flex-direction: column;
+}
+//home content
+.home-content {
+  // home top panels include quiz coins,player,quiz playlist
+  &__top-panels {
+    display: flex;
+    gap: 0.3rem;
+    height: 14.2rem;
+    margin-bottom: 6px;
+    flex-shrink: 0;
+  }
+  // home quiz coins
+  &__left-quiz {
+    flex: 1;
+    .lights {
+      margin-left: 2.4rem;
+    }
+  }
+  // home player audio/video
+  &__center-player {
+    flex: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 2000px;
+    overflow: hidden;
+    border-radius: 6px;
+    transform-style: flat;
+    position: relative;
+  }
+  // home quiz playlist
+  &__right-playlist {
+    flex: 1;
+    .lights {
+      margin-right: 2.4rem;
+    }
+  }
+  //home artists images with swiper
+  &__center-top {
+    flex-shrink: 0;
+  }
+  //home songlist
+  &__center-bottom {
+    flex: 1;
+    min-height: 0;
+    // song list
+    .song-list {
+      height: 100%;
+    }
+  }
+}

@@ -1,0 +1,91 @@
+@use "@/styles/abstracts/variables" as *;
+
+.songs {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  &__header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  &__header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  &__filters {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+
+    .settings-search {
+      flex: 1;
+      min-width: 150px;
+    }
+  }
+}
+
+// Song title cell
+.song-title-cell {
+  font-size: 0.8rem;
+  line-height: 1.3;
+}
+
+// Duration cell — monospace feel
+.song-duration {
+  white-space: nowrap;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+// Played count cell
+.song-played {
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  text-align: left;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .songs {
+    &__header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.5rem;
+    }
+
+    &__header-left {
+      justify-content: space-between;
+    }
+
+    &__header-right {
+      flex-direction: column;
+
+      .btn-action {
+        width: 100%;
+      }
+    }
+
+    &__filters {
+      flex-direction: column;
+
+      .settings-search {
+        width: 100%;
+        min-width: auto;
+      }
+    }
+  }
+}

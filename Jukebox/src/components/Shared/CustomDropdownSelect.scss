@@ -1,0 +1,200 @@
+@use "@/styles/abstracts/variables.scss" as *;
+
+.custom-select {
+  position: relative;
+  min-width: 140px;
+
+  // Override Bootstrap CSS variables that might cause blue
+  --bs-dropdown-link-active-bg: transparent;
+  --bs-dropdown-link-hover-bg: transparent;
+  --bs-link-color: #{$gold};
+  --bs-blue: #{$primary};
+  --bs-primary: #{$primary};
+
+  // Reset browser defaults and remove blue highlight
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  &__trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid $primary;
+    border-radius: 4px;
+    color: $gold;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-align: left;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.6);
+      border-color: $gold;
+    }
+
+    &:focus {
+      background: rgba(0, 0, 0, 0.6);
+      border-color: $gold;
+      outline: none;
+    }
+  }
+
+  &__value {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__arrow {
+    font-size: 0.7rem;
+    color: rgba($gold, 0.6);
+    transition: transform 0.2s ease;
+  }
+
+  // Open state
+  &--open {
+    .custom-select__trigger {
+      background: rgba(0, 0, 0, 0.6);
+      border-color: $gold;
+    }
+
+    .custom-select__arrow {
+      transform: rotate(180deg);
+    }
+  }
+
+  &__dropdown {
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background-color: #1a1a2e !important;
+    border: 1px solid $primary;
+    border-radius: 4px;
+    margin: 0;
+    padding: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+
+    &::selection,
+    & *::selection {
+      background: rgba($primary, 0.3);
+      color: $gold;
+    }
+  }
+
+  &__search {
+    padding: 0.35rem 0.5rem;
+    border-bottom: 1px solid rgba($primary, 0.3);
+  }
+
+  &__search-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba($primary, 0.4);
+    border-radius: 3px;
+    color: $gold;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+    outline: none;
+
+    &::placeholder {
+      color: rgba($gold, 0.4);
+    }
+
+    &:focus {
+      border-color: $gold;
+    }
+  }
+
+  &__options {
+    list-style: none;
+    margin: 0;
+    padding: 0.25rem 0;
+    max-height: 200px;
+    overflow-y: auto;
+
+    // Custom scrollbar
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: $primary;
+      border-radius: 3px;
+    }
+  }
+
+  &__no-results {
+    padding: 0.5rem 0.75rem;
+    color: rgba($gold, 0.4);
+    font-size: 0.8rem;
+    font-style: italic;
+  }
+
+  &__more-hint {
+    padding: 0.3rem 0.75rem;
+    color: rgba($gold, 0.35);
+    font-size: 0.75rem;
+    text-align: center;
+    border-top: 1px solid rgba($primary, 0.15);
+  }
+
+  &__option {
+    padding: 0.4rem 0.75rem;
+    color: $gold !important;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    background-color: #1a1a2e !important;
+    user-select: none;
+    -webkit-user-select: none;
+    outline: none !important;
+    border: none !important;
+    // Kill ALL blue highlights
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-focus-ring-color: transparent !important;
+
+    &:hover {
+      background-color: rgba($primary, 0.4) !important;
+      color: $gold !important;
+    }
+
+    &:focus,
+    &:focus-visible {
+      outline: none !important;
+      box-shadow: none !important;
+      background-color: rgba($primary, 0.3) !important;
+    }
+
+    &:active {
+      background-color: rgba($primary, 0.5) !important;
+    }
+
+    &--selected {
+      background-color: rgba($primary, 0.25) !important;
+      color: $gold !important;
+
+      &::after {
+        content: " ✓";
+        opacity: 0.6;
+      }
+
+      &:hover {
+        background-color: rgba($primary, 0.4) !important;
+      }
+    }
+  }
+}

@@ -1,0 +1,83 @@
+@use "@/styles/abstracts/variables" as *;
+// reusable buttons for backoffice
+.settings-content {
+
+  // generics buttons 
+  .btn-action {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid $primary;
+    border-radius: 4px;
+    color: $gold;
+    padding: 0.3rem 0.8rem;
+    white-space: nowrap;
+    font-size: 0.85rem;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba($primary, 0.4);
+    }
+
+    &--primary {
+      background: rgba($primary, 0.3);
+      border-color: $gold;
+
+      &:hover {
+        background: rgba($primary, 0.5);
+      }
+    }
+
+    &--danger {
+      background: rgba(220, 53, 69, 0.2);
+      border-color: #dc3545;
+      color: #ff6b6b;
+
+      &:hover {
+        background: rgba(220, 53, 69, 0.4);
+      }
+    }
+
+    &--secondary {
+      background: rgba(108, 117, 125, 0.2);
+      border-color: #6c757d;
+      color: #adb5bd;
+
+      &:hover {
+        background: rgba(108, 117, 125, 0.4);
+      }
+    }
+  }
+  // crud buttons for backoffice
+  .btn-icon {
+    background: rgba($primary, 0.2);
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: $gold;
+    padding: 0.2rem 0.4rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba($primary, 0.4);
+      border-color: $primary;
+    }
+
+    &--danger:hover {
+      background: rgba(220, 53, 69, 0.3);
+      border-color: #dc3545;
+      color: #ff6b6b;
+    }
+
+    &--success:hover {
+      background: rgba(40, 167, 69, 0.3);
+      border-color: #28a745;
+      color: #5fdd77;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .btn-action {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+    }
+  }
+}

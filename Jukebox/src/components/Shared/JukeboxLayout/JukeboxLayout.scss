@@ -1,0 +1,133 @@
+@use "@/styles/abstracts/variables.scss" as *;
+@use "@/styles/animations/animations" as *;
+
+/* Center page horizontal and vertical with background color */
+.main-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at center, #2a1030 0%, #2a1030, #000);
+}
+
+/* jukebox container and jukebox base image*/
+.jukebox-container {
+  width: min(100vw, 1366px);
+  aspect-ratio: 5/ 3;
+  background-image: url("../../../assets/base.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  position: relative;
+  filter: drop-shadow(0 30px 80px rgba(0, 0, 0, 0.9));
+  perspective: 2200px;
+  //copyright Dobri Dobrev
+  &__copyright {
+    position: absolute;
+    top: 92%;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: $copyright;
+  }
+}
+// jukebox layout inside juekbox base image
+.jukebox-layout {
+  position: absolute;
+  top: 12%;
+  left: 10%;
+  right: 10%;
+  bottom: 25%;
+  transition: transform 0.7s ease;
+  transform-style: preserve-3d;
+  // shake animation
+  &.shake {
+    animation: shake 0.5s ease;
+  }
+  //rotate 180 deg animation
+  &.flipped {
+    transform: rotateY(180deg);
+  }
+  // front and back face for Home layout and Settings layout
+  &__front,
+  &__back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  // front layout
+  &__front {
+    transform: rotateY(0deg);
+    pointer-events: auto;
+    // shake animation for home page
+    &.shake {
+      animation: shake 0.5s ease;
+    }
+  }
+
+  // when front is rotate no pointer events
+  &.flipped &__front {
+    pointer-events: none;
+  }
+  // when back layout is rotate no pointer events
+  &__back {
+    transform: rotateY(180deg);
+    pointer-events: none;
+    //shake animation
+    &.shake {
+      animation: shake-settings 0.5s ease;
+    }
+  }
+
+  // when settings page allow pointer events
+  &.flipped &__back {
+    pointer-events: auto;
+  }
+}
+// shake animations
+@keyframes shake-settings {
+  0%, 100% {
+    transform: rotateY(180deg) translateX(0);
+  }
+  20% {
+    transform: rotateY(180deg) translateX(-10px);
+  }
+  40% {
+    transform: rotateY(180deg) translateX(10px);
+  }
+  60% {
+    transform: rotateY(180deg) translateX(-10px);
+  }
+  80% {
+    transform: rotateY(180deg) translateX(10px);
+  }
+}
+// jukebox bottom include Nav, Controls, Insert coins
+.jukebox-bottom {
+  position: absolute;
+  top: 77%;
+  left: 11%;
+  right: 11%;
+  user-select: none;
+
+  &__panels {
+    display: flex;
+    justify-content: space-between;
+  }
+  // controls center panel
+  &__center-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin: 0 32px;
+  }
+  // insert coins image
+  &__coins-image {
+    width: 228px;
+    height: 155px;
+    object-fit: fill;
+    border-bottom-right-radius: 18px;
+    border-bottom-left-radius: 13px;
+  }
+}

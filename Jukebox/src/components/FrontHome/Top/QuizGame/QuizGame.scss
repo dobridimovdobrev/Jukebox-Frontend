@@ -1,0 +1,398 @@
+@use "@/styles/abstracts/variables" as *;
+
+// 3x blink animation for correct answer highlight
+@keyframes quiz-blink-correct {
+  0%,
+  100% {
+    background: rgba(40, 167, 69, 0.5);
+    border-color: #28a745;
+    color: #5fdd77;
+  }
+  50% {
+    background: rgba(0, 0, 0, 0.5);
+    border-color: rgba($primary, 0.5);
+    color: $gold;
+  }
+}
+
+// Quiz game overlay — sits absolutely inside center-player
+.quiz-game {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease-in-out;
+  border-radius: 10px;
+  border: 1px solid $primary;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  &--active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  // inner content container (dark overlay over background image)
+  &__content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.8rem 1.2rem;
+    background: rgba(#0a0908, 0.8);
+  }
+
+  // close button (top-right, all screens)
+  &__close {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.8rem;
+    background: none;
+    border: none;
+    color: $gold;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.7;
+    z-index: 2;
+    padding: 0;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  // generic screen wrapper
+  &__screen {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9rem;
+    position: relative;
+  }
+
+  // screen title
+  &__title {
+    color: $secondary;
+    text-transform: uppercase;
+    font-size: 1rem;
+    text-shadow: 0 0 8px rgba($primary, 0.4);
+    margin: 0;
+  }
+
+  // --- BACK LINK (arrow, top-left) ---
+  &__back-link {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: none;
+    border: none;
+    color: rgba($gold, 0.7);
+    font-size: .9rem;
+    cursor: pointer;
+    padding: 0;
+    letter-spacing: 0.02em;
+
+    &:hover {
+      color: $gold;
+      text-decoration: underline;
+    }
+  }
+
+  // --- INTRO SCREEN ---
+  &__intro-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+  }
+
+  &__intro-text {
+    color: $gold;
+    text-align: center;
+    font-size: 0.88rem;
+    line-height: 1.5;
+
+    p {
+      margin: 0.2rem 0;
+    }
+
+    strong {
+      color: #32cd32;
+    }
+  }
+
+  &__coin-display {
+    font-family: "Courier New", monospace;
+    color: #32cd32;
+    font-weight: bold;
+    text-shadow: 0 0 7px #32cd32;
+  }
+
+  &__intro-footer {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.6rem;
+    border-top: 1px solid rgba($primary, 0.15);
+  }
+
+  &__checkbox-label {
+    color: $gold;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+  }
+
+  &__checkbox {
+    accent-color: rgba($primary, 1);
+    width: 14px;
+    height: 14px;
+  }
+
+  // --- BUTTONS ---
+  &__btn {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid $primary;
+    border-radius: 4px;
+    color: $gold;
+    padding: 0.35rem 1.1rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover:not(:disabled) {
+      background: rgba($primary, 0.4);
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    &--proceed {
+      background: rgba($primary, 0.3);
+      border-color: $gold;
+    }
+
+    &--close {
+      background: rgba(108, 117, 125, 0.3);
+      border-color: #6c757d;
+      color: #adb5bd;
+    }
+  }
+
+  // --- HINT TEXT (below options) ---
+  &__hint-text {
+    color: rgba($gold, 0.6);
+    font-size: 0.8rem;
+    margin-top: 0.2rem;
+  }
+
+  // --- ERROR TEXT ---
+  &__error-text {
+    color: #dc3545;
+    font-size: 0.8rem;
+    text-align: center;
+  }
+
+  // --- DIFFICULTY / CATEGORY OPTIONS ---
+  &__options {
+    display: flex;
+    gap: 0.7rem;
+    width: 100%;
+    justify-content: center;
+  }
+
+  &__option {
+    flex: 1;
+    max-width: 8rem;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid $primary;
+    border-radius: 6px;
+    color: $gold;
+    padding: 0.65rem 0.5rem;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    transition: background 0.2s, border-color 0.2s;
+
+    &:hover:not(:disabled) {
+      background: rgba($primary, 0.3);
+      border-color: $gold;
+    }
+
+    &:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    &--easy {
+      border-left: 3px solid #28a745;
+    }
+
+    &--medium {
+      border-left: 3px solid #ffc107;
+    }
+
+    &--hard {
+      border-left: 3px solid #dc3545;
+    }
+  }
+
+  &__option-label {
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 0.85rem;
+  }
+
+  &__option-reward,
+  &__option-count {
+    font-size: 0.75rem;
+    color: rgba($gold, 0.7);
+  }
+
+  // --- QUESTION SCREEN ---
+  &__question-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__question-text {
+    color: $gold;
+    font-size: 0.82rem;
+    font-weight: 600;
+    margin: 0;
+    flex: 1;
+  }
+
+  &__progress {
+    color: rgba($gold, 0.7);
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  &__answers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.55rem;
+    width: 100%;
+  }
+
+  &__answer {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1.5px solid rgba($primary, 0.5);
+    border-radius: 5px;
+    color: $gold;
+    padding: 0.5rem 0.65rem;
+    font-size: 0.72rem;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    text-align: left;
+
+    &:hover:not(:disabled) {
+      background: rgba($primary, 0.25);
+      border-color: rgba($primary, 0.8);
+    }
+
+    &:disabled {
+      cursor: default;
+    }
+
+    // 3x green blink for correct answer
+    &--blink {
+      animation: quiz-blink-correct 0.4s ease-in-out 2;
+      animation-fill-mode: forwards;
+    }
+
+    // solid red for wrong answer
+    &--wrong {
+      background: rgba(220, 53, 69, 0.4) !important;
+      border-color: #dc3545 !important;
+      color: #ff6b6b;
+    }
+  }
+
+  // --- RESULTS SCREEN ---
+  &__stats {
+    display: flex;
+    gap: 1.1rem;
+    justify-content: center;
+    margin: 0.4rem 0;
+  }
+
+  &__stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.55rem 1rem;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba($primary, 0.3);
+
+    &--correct {
+      border-color: rgba(40, 167, 69, 0.5);
+    }
+
+    &--wrong {
+      border-color: rgba(220, 53, 69, 0.5);
+    }
+
+    &--coins {
+      border-color: rgba(50, 205, 50, 0.5);
+    }
+  }
+
+  &__stat-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    font-family: "Courier New", monospace;
+
+    .quiz-game__stat--correct & {
+      color: #28a745;
+    }
+
+    .quiz-game__stat--wrong & {
+      color: #dc3545;
+    }
+
+    .quiz-game__stat--coins & {
+      color: #32cd32;
+      text-shadow: 0 0 7px rgba(50, 205, 50, 0.5);
+    }
+  }
+
+  &__stat-label {
+    font-size: 0.65rem;
+    color: rgba($gold, 0.7);
+    text-transform: uppercase;
+  }
+
+  &__results-actions {
+    display: flex;
+    gap: 0.7rem;
+    margin-top: 0.3rem;
+  }
+}

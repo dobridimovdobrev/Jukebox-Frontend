@@ -1,0 +1,225 @@
+@use "@/styles/abstracts/variables" as *;
+
+.artists {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  &__header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  &__header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  &__filters {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+
+    .settings-search {
+      flex: 1;
+      min-width: 150px;
+    }
+  }
+
+  // Import section with real-time search
+  &__import {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba($primary, 0.2);
+    border-radius: 6px;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  &__import-search {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .settings-search {
+      flex: 1;
+    }
+  }
+
+  &__import-spinner {
+    font-size: 0.75rem;
+    color: $primary;
+    white-space: nowrap;
+    opacity: 0.8;
+  }
+
+  &__import-dropdown {
+    max-height: 280px;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba($primary, 0.3);
+    border-radius: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: $primary transparent;
+
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: $primary;
+      border-radius: 4px;
+
+      &:hover {
+        background: $gold;
+      }
+    }
+  }
+
+  &__import-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    &:hover {
+      background: rgba($primary, 0.15);
+    }
+
+    &--exists {
+      opacity: 0.6;
+    }
+  }
+
+  &__import-photo {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 1px solid rgba($primary, 0.3);
+  }
+
+  &__import-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+  }
+
+  &__import-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: $gold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__import-meta {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+  }
+
+  &__import-badge {
+    background: rgba($primary, 0.3);
+    color: $primary;
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.65rem;
+    margin-left: 0.3rem;
+  }
+
+  &__import-empty {
+    display: block;
+    padding: 0.75rem;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.8rem;
+  }
+
+  &__import-success {
+    font-size: 0.8rem;
+    color: #4caf50;
+  }
+}
+
+// Artist photo thumbnail in table
+.artist-photo {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba($primary, 0.4);
+  display: block;
+
+  &--placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.3);
+    font-size: 0.9rem;
+    line-height: 1;
+  }
+}
+
+// Career span cell
+.artist-career {
+  white-space: nowrap;
+  font-size: 0.8rem;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .artists {
+    &__header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.5rem;
+    }
+
+    &__header-left {
+      justify-content: space-between;
+    }
+
+    &__header-right {
+      flex-direction: column;
+
+      .btn-action {
+        width: 100%;
+      }
+    }
+
+    &__filters {
+      flex-direction: column;
+
+      .settings-search {
+        width: 100%;
+        min-width: auto;
+      }
+    }
+  }
+}

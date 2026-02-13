@@ -1,0 +1,151 @@
+@use "@/styles/abstracts/variables.scss" as *;
+
+.song-list {
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 0.2rem;
+  border: 5px solid $highlight;
+  border-radius: 5px;
+  max-height: 100%;
+  overflow-y: auto;
+  pointer-events: all;
+  margin-top: 5px;
+
+  // custom scrollbar
+  &::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $info;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $primary;
+    border-radius: 4px;
+
+    &:hover {
+      background: $gold;
+    }
+  }
+
+  // Firefox scrollbar
+  scrollbar-width: thin;
+  scrollbar-color: $primary $info;
+
+  // overflow in y axis mobile responsive
+  @media (max-width: 430px) {
+    flex-direction: column;
+    max-height: 480px;
+    overflow-y: scroll;
+  }
+
+  // empty state
+  &__empty {
+    width: 100%;
+    text-align: center;
+    color: $gold;
+    padding: 2rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  // songs box for number,title,duration
+  &__box {
+    width: 100%;
+    display: flex;
+    flex: 0 0 calc(20% - 0.2rem);
+    justify-content: space-between;
+    align-items: center;
+    background-color: $song;
+    border: 1px solid $special;
+    padding: 0 2px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgba($highlight, 0.5);
+    }
+
+    &--active {
+      background-color: rgba($highlight, 0.7);
+    }
+
+    &--disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  // song number
+  &__number {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 20px;
+    height: 20px;
+    padding: 4px 12px;
+    background-color: $special;
+    color: $gold;
+  }
+
+  //song title
+  &__title {
+    margin: 0;
+    padding: 0 3px;
+    color: #000;
+    // truncate title
+    flex: 1;
+    min-width: 0;
+    max-width: 17ch;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  // song duration
+  &__duration {
+    color: #000;
+  }
+
+  // --- GENERATION MODE ---
+  &--generating {
+    border-color: rgba($primary, 0.8);
+    box-shadow: 0 0 12px rgba($primary, 0.3);
+  }
+
+  &__generating-header {
+    width: 100%;
+    text-align: center;
+    color: $gold;
+    padding: 1rem 0.5rem;
+    font-size: 0.85rem;
+    animation: generating-pulse 1.5s ease-in-out infinite;
+  }
+
+  // enter animation for songs being added during generation
+  &__box--entering {
+    animation: song-enter 0.4s ease-out;
+  }
+}
+
+@keyframes song-enter {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes generating-pulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+    text-shadow: 0 0 8px rgba($primary, 0.5);
+  }
+}

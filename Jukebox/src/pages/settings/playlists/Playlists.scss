@@ -1,0 +1,185 @@
+@use "@/styles/abstracts/variables" as *;
+
+.playlists {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  &__header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  &__header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  &__filters {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+
+    .settings-search {
+      flex: 1;
+      min-width: 150px;
+    }
+  }
+}
+
+// Table cells
+.playlist-name-cell {
+  font-weight: 500;
+}
+
+.playlist-artists-cell {
+  font-size: 0.85rem;
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playlist-user-cell {
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.playlist-date-cell {
+  white-space: nowrap;
+  font-size: 0.8rem;
+}
+
+// Form: artist rows
+.playlists-form__artist-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  padding: 0.75rem;
+  background: rgba($primary, 0.05);
+  border-radius: 6px;
+  border: 1px solid rgba($primary, 0.15);
+}
+
+.playlists-form__artist-select {
+  flex: 1;
+  min-width: 180px;
+}
+
+.playlists-form__year-range {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.playlists-form__year-field {
+  min-width: 90px;
+}
+
+.playlists-form__year-separator {
+  color: $gold;
+  font-size: 1.1rem;
+  padding-bottom: 0.5rem;
+}
+
+.playlists-form__remove-artist {
+  background: none;
+  border: 1px solid rgba(#dc3545, 0.4);
+  color: #dc3545;
+  font-size: 1.2rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.25rem;
+  transition: all 0.2s;
+
+  &:hover {
+    background: rgba(#dc3545, 0.15);
+    border-color: #dc3545;
+  }
+}
+
+.playlists-form__add-artist {
+  background: none;
+  border: 1px dashed rgba($primary, 0.5);
+  color: $gold;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+  transition: all 0.2s;
+
+  &:hover {
+    background: rgba($primary, 0.1);
+    border-color: $primary;
+  }
+}
+
+.playlists-form__songs-info {
+  font-size: 0.8rem;
+  color: $gold;
+  opacity: 0.7;
+  margin-top: 0.35rem;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .playlists {
+    &__header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.5rem;
+    }
+
+    &__header-left {
+      justify-content: space-between;
+    }
+
+    &__header-right {
+      flex-direction: column;
+
+      .btn-action {
+        width: 100%;
+      }
+    }
+
+    &__filters {
+      flex-direction: column;
+
+      .settings-search {
+        width: 100%;
+        min-width: auto;
+      }
+    }
+  }
+
+  .playlists-form__artist-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .playlists-form__year-range {
+    flex-wrap: wrap;
+  }
+
+  .playlists-form__remove-artist {
+    align-self: flex-end;
+  }
+}

@@ -1,0 +1,97 @@
+@use "@/styles/abstracts/variables" as *;
+@use "@/styles/abstracts/mixins" as *;
+// reusable styles of page tables in settings backoffice
+.settings-content {
+  // table container
+  .table-container {
+    flex: 1;
+    overflow-y: auto;
+    border: 1px solid rgba($primary, 0.4);
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.4);
+    position: relative;
+    // custom table scrollbar
+    @include custom-scrollbar;
+  }
+  // reusable table class
+  .settings-table {
+    color: $gold !important;
+    margin-bottom: 0;
+    background-color: transparent !important;
+    --bs-table-bg: transparent !important;
+    --bs-table-striped-bg: transparent !important;
+    --bs-table-hover-bg: transparent !important;
+    // table head
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      // table heading
+      th {
+        background: $info;
+        border-bottom: 2px solid $primary !important;
+        color: $secondary !important;
+        font-weight: 600;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 0.5rem;
+      }
+    }
+    // table body
+    tbody {
+      // table row
+      tr {
+        background: rgba(0, 0, 0, 0.3) !important;
+        cursor: default !important;
+
+        &:nth-child(even) {
+          background: rgba(0, 0, 0, 0.45) !important;
+        }
+
+        &:hover {
+          background: rgba($primary, 0.2) !important;
+        }
+      }
+      // table data
+      td {
+        cursor: default !important;
+        border-color: rgba($primary, 0.2) !important;
+        vertical-align: middle;
+        padding: 0.4rem 0.5rem;
+        font-size: 0.85rem;
+        background: transparent !important;
+        color: $gold !important;
+      }
+    }
+    // table heading
+    th {
+      border-color: rgba($primary, 0.2) !important;
+    }
+  }
+  // Row number column (shared across all CRUD tables)
+  .col-number {
+    width: 40px !important;
+    text-align: center !important;
+    color: rgba($gold, 0.6) !important;
+    font-size: 0.75rem !important;
+  }
+
+  // table buttons display
+  .table-actions {
+    display: flex;
+    justify-content: flex-start;
+    gap: 1rem;
+  }
+  // responsive table
+  @media (max-width: 768px) {
+    .settings-table {
+      font-size: 0.75rem;
+
+      td,
+      th {
+        padding: 0.4rem;
+      }
+    }
+  }
+}

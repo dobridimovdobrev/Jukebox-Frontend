@@ -1,0 +1,486 @@
+@use "@/styles/abstracts/variables" as *;
+
+// Playlist wizard overlay — same position as quiz-game
+.playlist-wizard {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease-in-out;
+  border-radius: 10px;
+  border: 1px solid $primary;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  &--active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  // dark overlay
+  &__content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.8rem 1.2rem;
+    background: rgba(#0a0908, 0.85);
+    position: relative;
+  }
+
+  // close button
+  &__close {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.8rem;
+    background: none;
+    border: none;
+    color: $gold;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.7;
+    z-index: 2;
+    padding: 0;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  // screen wrapper
+  &__screen {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    position: relative;
+  }
+
+  // title
+  &__title {
+    color: $secondary;
+    text-transform: uppercase;
+    font-size: 0.95rem;
+    text-shadow: 0 0 8px rgba($primary, 0.4);
+    margin: 0;
+  }
+
+  &__subtitle {
+    color: rgba($gold, 0.7);
+    font-size: 0.75rem;
+    margin: 0;
+    text-align: center;
+  }
+
+  // back link
+  &__back-link {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: none;
+    border: none;
+    color: rgba($gold, 0.7);
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 0;
+
+    &:hover {
+      color: $gold;
+      text-decoration: underline;
+    }
+  }
+
+  // hint text
+  &__hint {
+    color: rgba($gold, 0.6);
+    font-size: 0.7rem;
+  }
+
+  // error text
+  &__error {
+    color: #dc3545;
+    font-size: 0.75rem;
+    text-align: center;
+  }
+
+  // --- FORM FIELDS ---
+  &__field {
+    width: 100%;
+    max-width: 18rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  &__label {
+    color: rgba($gold, 0.8);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+  }
+
+  &__input {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba($primary, 0.5);
+    border-radius: 4px;
+    color: $gold;
+    padding: 0.35rem 0.5rem;
+    font-size: 0.78rem;
+    outline: none;
+    width: 100%;
+
+    &::placeholder {
+      color: rgba($gold, 0.3);
+    }
+
+    &:focus {
+      border-color: $gold;
+    }
+  }
+
+  // --- TYPE SELECTION (Screen 1) ---
+  &__type-grid {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 0.2rem;
+  }
+
+  &__type-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.5rem 0.9rem;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba($primary, 0.4);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+    min-width: 6.5rem;
+
+    &:hover {
+      background: rgba($primary, 0.2);
+      border-color: $gold;
+      box-shadow: 0 0 10px rgba($primary, 0.3);
+    }
+  }
+
+  &__type-icon {
+    font-size: 1.1rem;
+    color: $primary;
+  }
+
+  &__type-label {
+    color: $gold;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  &__type-desc {
+    color: rgba($gold, 0.5);
+    font-size: 0.6rem;
+  }
+
+  // --- COUNT SELECTION (Screen 3) ---
+  &__count-grid {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.2rem;
+  }
+
+  &__count-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1rem;
+    padding: 0.45rem 0.8rem;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba($primary, 0.4);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+    min-width: 3.5rem;
+
+    &:hover {
+      background: rgba($primary, 0.2);
+      border-color: $gold;
+      box-shadow: 0 0 10px rgba($primary, 0.3);
+    }
+  }
+
+  &__count-number {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: $gold;
+  }
+
+  &__count-label {
+    color: rgba($gold, 0.5);
+    font-size: 0.6rem;
+    white-space: nowrap;
+  }
+
+  // --- ARTIST SEARCH (Screen 4) ---
+  &__search {
+    width: 100%;
+    max-width: 18rem;
+    position: relative;
+  }
+
+  &__search-field {
+    position: relative;
+  }
+
+  &__search-spinner {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    border: 2px solid rgba($gold, 0.3);
+    border-top-color: $gold;
+    border-radius: 50%;
+    animation: wizard-spin 0.6s linear infinite;
+  }
+
+  &__search-dropdown {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(#0a0908, 0.95);
+    border: 1px solid rgba($primary, 0.5);
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+    max-height: 8rem;
+    overflow-y: auto;
+    z-index: 10;
+    scrollbar-width: thin;
+    scrollbar-color: $primary transparent;
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: $primary;
+      border-radius: 3px;
+    }
+  }
+
+  &__search-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.5rem;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    &:hover {
+      background: rgba($primary, 0.25);
+    }
+  }
+
+  &__search-photo {
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid rgba($primary, 0.3);
+    flex-shrink: 0;
+  }
+
+  &__search-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  &__search-name {
+    color: $gold;
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__search-genre {
+    color: rgba($gold, 0.5);
+    font-size: 0.6rem;
+  }
+
+  &__search-empty {
+    display: block;
+    padding: 0.5rem;
+    color: rgba($gold, 0.4);
+    font-size: 0.7rem;
+    text-align: center;
+  }
+
+  // --- SELECTED ARTISTS CHIPS ---
+  &__selected-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    width: 100%;
+    max-width: 18rem;
+    justify-content: center;
+  }
+
+  &__selected-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.15rem 0.4rem 0.15rem 0.15rem;
+    background: rgba($primary, 0.25);
+    border: 1px solid rgba($gold, 0.6);
+    border-radius: 20px;
+  }
+
+  &__selected-photo {
+    width: 1.2rem;
+    height: 1.2rem;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  &__selected-name {
+    color: $gold;
+    font-size: 0.65rem;
+    font-weight: 600;
+    max-width: 7rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__selected-remove {
+    background: none;
+    border: none;
+    color: rgba($gold, 0.6);
+    font-size: 0.8rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 0.1rem;
+
+    &:hover {
+      color: #dc3545;
+    }
+  }
+
+  // --- PROGRESS BAR ---
+  &__progress-bar {
+    width: 80%;
+    height: 0.45rem;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba($primary, 0.3);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  &__progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, $primary, $gold);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+
+  &__progress-text {
+    color: $gold;
+    font-size: 0.9rem;
+    font-weight: 700;
+    font-family: "Courier New", monospace;
+    text-shadow: 0 0 7px rgba($primary, 0.5);
+  }
+
+  // --- RESULT ---
+  &__result {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba($primary, 0.3);
+    gap: 0.15rem;
+  }
+
+  &__result-name {
+    color: $gold;
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+
+  &__result-count {
+    color: rgba($gold, 0.6);
+    font-size: 0.7rem;
+  }
+
+  // --- BUTTONS ---
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    max-width: 18rem;
+    margin-top: 0.2rem;
+
+    &--bottom-right {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: auto;
+      max-width: none;
+    }
+
+    &--center {
+      justify-content: center;
+      max-width: none;
+    }
+  }
+
+  &__btn {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid $primary;
+    border-radius: 4px;
+    color: $gold;
+    padding: 0.3rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover:not(:disabled) {
+      background: rgba($primary, 0.4);
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    &--proceed {
+      background: rgba($primary, 0.3);
+      border-color: $gold;
+    }
+  }
+}
+
+@keyframes wizard-spin {
+  to {
+    transform: translateY(-50%) rotate(360deg);
+  }
+}

@@ -1,0 +1,125 @@
+@use "@/styles/abstracts/variables.scss" as *;
+@use "@/styles/animations/animations" as *;
+
+.jukebox-header {
+  position: absolute;
+  top: 2.5%;
+  left: 49%;
+  transform: translateX(-50%);
+  width: 35%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.6rem;
+  padding-left: 5px;
+  z-index: 10;
+
+  // wrapper that holds both logo and marquee (same space)
+  &__display {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    height: 2.4rem;
+  }
+
+  &__logo {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: $primary;
+    text-shadow: 0 0 6px rgba($primary, 0.4);
+    letter-spacing: 2.2rem;
+    text-indent: 2.2rem;
+    margin: 0;
+    animation: logo-glow 2s ease-in-out infinite alternate;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+    white-space: nowrap;
+
+    &--hidden {
+      opacity: 0;
+    }
+  }
+
+  // now-playing track info (static text, cross-fades with logo)
+  &__track {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+
+    &--active {
+      opacity: 1;
+    }
+  }
+  // text song track in header
+  &__track-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 30ch;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: $primary;
+    text-shadow: 0 0 6px rgba($primary, 0.4);
+    animation: logo-glow 2s ease-in-out infinite alternate;
+  }
+
+  &__pulse {
+    position: relative;
+    width: 30px;
+    height: 30px;
+
+    &--left,
+    &--right {
+      flex-shrink: 0;
+    }
+  }
+
+  &__pulse-center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    background: $primary;
+    border-radius: 50%;
+    box-shadow: 0 0 8px $primary;
+    animation: pulse-glow 0.8s ease-in-out infinite alternate;
+  }
+
+  &__pulse-ring {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border: 2px solid $primary;
+    border-radius: 50%;
+    opacity: 0;
+    animation: pulse-expand 2s ease-out infinite;
+
+    &--1 {
+      width: 12px;
+      height: 12px;
+    }
+    &--2 {
+      width: 20px;
+      height: 20px;
+      animation-delay: 0.4s;
+    }
+    &--3 {
+      width: 28px;
+      height: 28px;
+      animation-delay: 0.8s;
+    }
+  }
+}

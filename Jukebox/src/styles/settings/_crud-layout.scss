@@ -1,0 +1,81 @@
+@use "@/styles/abstracts/variables" as *;
+@use "sass:color";
+
+.settings-content {
+  // Unified layout for CRUD pages: table + form side by side
+  .crud-layout {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+
+    // Left side: the data table (always present in DOM)
+    &__table {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    // Right side: create/update form (hidden until route activates it)
+    &__form {
+      width: 0;
+      overflow: hidden;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    // Mobile-only back button (hidden on desktop)
+    &__back {
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      color: $gold;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.5rem 0;
+      font-size: 0.85rem;
+      margin-bottom: 0.5rem;
+
+      &:hover {
+        color: color.adjust($gold, $lightness: 15%);
+      }
+    }
+
+    // When a create/update route is active, show form full-page
+    &--form-active {
+      .crud-layout__table {
+        display: none;
+      }
+
+      .crud-layout__form {
+        width: 100%;
+        flex: 1;
+        overflow: visible;
+      }
+
+      .crud-layout__back {
+        display: flex;
+      }
+    }
+  }
+
+  // Infinite scroll loading indicator
+  .loading-more {
+    color: rgba($gold, 0.6) !important;
+    font-style: italic;
+    padding: 1rem !important;
+  }
+
+  // Placeholder for pages not yet built
+  .coming-soon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: $gold;
+    font-size: 1.5rem;
+    opacity: 0.5;
+  }
+}

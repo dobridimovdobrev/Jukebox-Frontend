@@ -1,0 +1,82 @@
+@use "@/styles/abstracts/variables" as *;
+@use "@/styles/settings";
+
+// settings page content
+.settings-content {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 1px solid $primary;
+  border-radius: 7rem 7rem 0 0;
+  overflow: hidden;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+
+  // top bar
+  &__top {
+    border-bottom: 1px solid $primary;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 1rem 4.5rem;
+  }
+  // top greeting
+  &__greeting {
+    font-size: 1.3rem;
+    color: $gold;
+    letter-spacing: 2px;
+    flex-shrink: 0;
+  }
+  // top navigation
+  &__navigation {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    margin: 0;
+  }
+  // navigation tabs
+  .btn-tab {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid $primary;
+    border-radius: 4px;
+    color: $gold;
+    padding: 0.4rem 1rem;
+    font-size: 0.85rem;
+    white-space: nowrap;
+
+    &:hover {
+      background: rgba($primary, 0.3);
+      border-color: $gold;
+    }
+
+    &.active {
+      background: rgba($primary, 0.5);
+      border-color: $gold;
+      color: #fff;
+    }
+  }
+
+  // main content area
+  &__main {
+    flex: 1;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    padding: 0.75rem 1rem !important;
+  }
+
+  // responsive
+  @media (max-width: 992px) {
+    .btn-tab {
+      padding: 0.3rem 0.6rem;
+      font-size: 0.75rem;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .btn-tab {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.7rem;
+    }
+  }
+}

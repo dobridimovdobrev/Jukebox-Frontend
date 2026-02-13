@@ -1,0 +1,89 @@
+@use "@/styles/abstracts/variables.scss" as *;
+
+.controls {
+  font-size: 2rem;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  color: $secondary;
+  margin-left: 10px;
+  margin-right: 2px;
+  padding:0.8rem 0;
+  background: rgba($info, .3);
+  border: 1px solid $primary;
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+  border-radius: 3px;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+
+  // icon toggle flip
+  &__toggle {
+    width: 2rem;
+    height: 2rem;
+    position: relative;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.2s ease;
+
+    &:hover {
+      .controls__toggle-front,
+      .controls__toggle-back {
+        color: $secondary;
+      }
+    }
+
+    &--flipped {
+      transform: rotateX(180deg);
+    }
+
+    &-front,
+    &-back {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      transition: color 0.2s ease;
+    }
+
+    &-front {
+      transform: rotateX(0deg);
+    }
+
+    &-back {
+      transform: rotateX(180deg);
+    }
+  }
+
+  &__icon {
+    cursor: pointer;
+    opacity: 0.8;
+
+    &:hover {
+      opacity: 1;
+      transform: scale(1.1);
+      color: $secondary;
+    }
+
+    &--active {
+      color: $secondary; 
+    }
+
+    &--play {
+      font-size: 2.4rem;
+      opacity: 1;
+
+      &:hover {
+        color: $secondary;
+        transform: scale(1.1);
+      }
+    }
+  }
+}

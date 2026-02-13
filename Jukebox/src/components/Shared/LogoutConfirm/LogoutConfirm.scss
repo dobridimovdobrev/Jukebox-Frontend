@@ -1,0 +1,92 @@
+@use "@/styles/abstracts/variables" as *;
+
+// Logout confirm overlay — sits absolutely inside center-player (like quiz-game)
+.logout-confirm {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease-in-out;
+  border-radius: 10px;
+  border: 1px solid $primary;
+  overflow: hidden;
+
+  &--active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  &__content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(#0a0908, 0.85);
+  }
+
+  &__screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  &__title {
+    color: $secondary;
+    text-transform: uppercase;
+    font-size: 1.1rem;
+    text-shadow: 0 0 8px rgba($primary, 0.4);
+    margin: 0;
+  }
+
+  &__message {
+    color: $gold;
+    font-size: 0.9rem;
+    text-align: center;
+    margin: 0;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+
+  &__btn {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid $primary;
+    border-radius: 4px;
+    color: $gold;
+    padding: 0.4rem 1.3rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+
+    &--cancel {
+      background: rgba(108, 117, 125, 0.3);
+      border-color: #6c757d;
+      color: #adb5bd;
+
+      &:hover {
+        background: rgba(108, 117, 125, 0.5);
+      }
+    }
+
+    &--confirm {
+      background: rgba($primary, 0.3);
+      border-color: $gold;
+
+      &:hover {
+        background: rgba($primary, 0.5);
+        box-shadow: 0 0 12px rgba($primary, 0.5);
+      }
+    }
+  }
+}

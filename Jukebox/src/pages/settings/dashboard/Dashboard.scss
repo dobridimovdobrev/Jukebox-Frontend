@@ -1,0 +1,89 @@
+@use "@/styles/abstracts/variables" as *;
+
+.dashboard {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  &__stats {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  &__table-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+}
+
+// Stat Cards
+.stat-card {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid $primary;
+  border-radius: 6px;
+  padding: 0.5rem;
+  text-align: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.5);
+    border-color: $gold;
+    transform: translateY(-2px);
+  }
+
+  &__value {
+    display: block;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: $gold;
+    line-height: 1;
+  }
+
+  &__label {
+    display: block;
+    font-size: 0.6rem;
+    color: $secondary;
+    margin-top: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+// Responsive
+@media (max-width: 992px) {
+  .stat-card {
+    &__value {
+      font-size: 1rem;
+    }
+
+    &__label {
+      font-size: 0.55rem;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard__stats {
+    flex-wrap: wrap;
+
+    .stat-card {
+      flex: 1 1 calc(33.333% - 0.5rem);
+      min-width: 80px;
+    }
+  }
+
+  .stat-card {
+    padding: 0.4rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .dashboard__stats .stat-card {
+    flex: 1 1 calc(50% - 0.5rem);
+  }
+}
