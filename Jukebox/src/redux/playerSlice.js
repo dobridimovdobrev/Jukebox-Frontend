@@ -2,26 +2,29 @@ import { createSlice } from "@reduxjs/toolkit";
 import { logout } from "./authSlice";
 
 const initialState = {
-  // playback
+  //playback
   currentSong: null,
   currentIndex: 0,
   isPlaying: false,
   showVideo: false,
 
-  // song list displayed in jukebox
+  //song list 
   songs: [],
   activePlaylistId: null,
   activeArtistId: null,
 
-  // shared data
+  //shared data
   artists: [],
   playlists: [],
 
-  // playlist generation
+  //playlist generation
   isGenerating: false,
 
-  // coins
-  coins: 5,
+  //coins
+  coins: (() => {
+    const saved = localStorage.getItem("jukebox_coins");
+    return saved !== null ? Number(saved) : 5;
+  })(),
   noCoinAttempt: 0,
 };
 
@@ -29,14 +32,15 @@ const playerSlice = createSlice({
   name: "player",
   initialState,
   reducers: {
-    // set songs in the song list
+    //set songs in the song list 
     setSongs: (state, action) => {
       state.songs = action.payload;
       state.currentIndex = 0;
-      state.currentSong = action.payload[0] || null;
+      state.currentSong = null;
+      state.isPlaying = false;
     },
 
-    // play a specific song (costs 1 coin)
+    //play a specific song 1 coin cost
     playSong: (state, action) => {
       const { song, index } = action.payload;
       if (state.coins <= 0) {
@@ -47,9 +51,10 @@ const playerSlice = createSlice({
       state.currentIndex = index;
       state.isPlaying = true;
       state.coins -= 1;
+      localStorage.setItem("jukebox_coins", state.coins);
     },
 
-    // play/pause toggle (no coin cost)
+    //play/pause
     togglePlay: (state) => {
       state.isPlaying = !state.isPlaying;
     },
@@ -58,7 +63,7 @@ const playerSlice = createSlice({
       state.isPlaying = false;
     },
 
-    // next/prev track (costs 1 coin)
+    //next/prev track cost 1 coin
     nextSong: (state) => {
       if (state.songs.length === 0) return;
       if (state.coins <= 0) {
@@ -70,6 +75,7 @@ const playerSlice = createSlice({
       state.currentSong = state.songs[next];
       state.isPlaying = true;
       state.coins -= 1;
+      localStorage.setItem("jukebox_coins", state.coins);
     },
 
     prevSong: (state) => {
@@ -85,9 +91,10 @@ const playerSlice = createSlice({
       state.currentSong = state.songs[prev];
       state.isPlaying = true;
       state.coins -= 1;
+      localStorage.setItem("jukebox_coins", state.coins);
     },
 
-    // toggle video/vinyl view
+    //toggle video/vinyl view
     toggleVideo: (state) => {
       state.showVideo = !state.showVideo;
     },
@@ -96,16 +103,18 @@ const playerSlice = createSlice({
       state.showVideo = action.payload;
     },
 
-    // coins
+    //coins
     addCoins: (state, action) => {
       state.coins += action.payload;
+      localStorage.setItem("jukebox_coins", state.coins);
     },
 
     spendCoin: (state) => {
       if (state.coins > 0) state.coins -= 1;
+      localStorage.setItem("jukebox_coins", state.coins);
     },
 
-    // track which playlist/artist is active in the song list
+    //track which playlist/artist is active in the song list
     setActivePlaylist: (state, action) => {
       state.activePlaylistId = action.payload;
       state.activeArtistId = null;
@@ -116,7 +125,7 @@ const playerSlice = createSlice({
       state.activePlaylistId = null;
     },
 
-    // shared data
+    //shared data
     setArtists: (state, action) => {
       state.artists = action.payload;
     },
@@ -129,18 +138,21 @@ const playerSlice = createSlice({
       state.playlists.unshift(action.payload);
     },
 
-    // playlist generation
+    //playlist generation
     setGenerating: (state, action) => {
       state.isGenerating = action.payload;
     },
 
-    // append songs incrementally (for animated population)
+    //apendsongs
     appendSongs: (state, action) => {
       state.songs.push(...action.payload);
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(logout, () => initialState);
+    builder.addCase(logout, () => {
+      localStorage.removeItem("jukebox_coins");
+      return initialState;
+    });
   },
 });
 

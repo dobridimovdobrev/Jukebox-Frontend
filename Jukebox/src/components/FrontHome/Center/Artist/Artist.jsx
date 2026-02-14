@@ -15,7 +15,7 @@ const Artist = () => {
   const [artists, setArtists] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch artists from backend on mount, default to Elvis Presley
+  //fetch artists from backend - default is Elvis Presley
   useEffect(() => {
     const fetchArtists = async () => {
       try {
@@ -24,7 +24,7 @@ const Artist = () => {
         setArtists(items);
         dispatch(setArtistsAction(items));
 
-        // Default: load Elvis Presley's songs if no artist is active
+        // default load elvis songs if no artist is active
         if (!activeArtistId) {
           const elvis = items.find((a) =>
             a.name.toLowerCase().includes("elvis")
@@ -57,14 +57,14 @@ const Artist = () => {
     fetchArtists();
   }, [dispatch, activeArtistId]);
 
-  // On artist click → fetch their songs and dispatch to Redux
+  // on artist click fetch their songs and dispatch to redux 
   const handleArtistClick = async (artist) => {
     if (artist.artistId === activeArtistId) return;
 
     try {
       dispatch(setActiveArtist(artist.artistId));
 
-      // Fetch all songs for this artist (multi-page if > 100)
+      // fetch all songs for this artist 
       const firstPage = await songService.getByArtist(artist.artistId, {
         PageSize: 100,
         PageNumber: 1,
@@ -83,7 +83,7 @@ const Artist = () => {
 
       dispatch(setSongs(allSongs));
 
-      // Auto-play first song only if user has coins
+      // atoplay first song only if user has coins
       if (allSongs.length > 0) {
         dispatch(playSong({ song: allSongs[0], index: 0 }));
       }
