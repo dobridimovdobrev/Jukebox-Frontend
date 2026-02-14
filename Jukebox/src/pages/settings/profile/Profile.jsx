@@ -13,6 +13,7 @@ const GENDER_OPTIONS = [
 // states
 const Profile = () => {
   const coins = useSelector((s) => s.player.coins);
+  const totalSongsPlayed = useSelector((s) => s.player.totalSongsPlayed);
   const [successMessage, showSuccess] = useSuccessMessage();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -236,7 +237,7 @@ const Profile = () => {
               <input
                 type="text"
                 className="settings-form__input"
-                value={readOnly.totalSongsPlayed}
+                value={totalSongsPlayed}
                 disabled
               />
             </div>

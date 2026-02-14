@@ -41,6 +41,7 @@ const ArtistTableView = ({
             <th>Name</th>
             <th>Genre</th>
             <th>Songs</th>
+            <th>Played</th>
             <th>Career</th>
             <th>Country</th>
             <th>Actions</th>
@@ -49,7 +50,7 @@ const ArtistTableView = ({
         <tbody>
           {artists.length === 0 ? (
             <tr>
-              <td colSpan="8" className="text-center">
+              <td colSpan="9" className="text-center">
                 {loading ? "Loading..." : "No artists found. Add one manually or import."}
               </td>
             </tr>
@@ -74,6 +75,7 @@ const ArtistTableView = ({
                   <td>{artist.name}</td>
                   <td>{artist.genre || "—"}</td>
                   <td>{artist.songsCount || 0}</td>
+                  <td>{artist.totalPlayed || 0}</td>
                   <td className="artist-career">
                     {formatCareer(artist.careerStart, artist.careerEnd)}
                   </td>
@@ -105,10 +107,10 @@ const ArtistTableView = ({
                   </td>
                 </tr>
               ))}
-              {/* infinite scroll trigger */}
+              {/* infinite scroll  */}
               {hasMore && (
                 <tr ref={loadMoreRef}>
-                  <td colSpan="8" className="text-center loading-more">
+                  <td colSpan="9" className="text-center loading-more">
                     {loading ? "Loading..." : ""}
                   </td>
                 </tr>

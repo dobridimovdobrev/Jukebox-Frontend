@@ -26,6 +26,12 @@ const initialState = {
     return saved !== null ? Number(saved) : 5;
   })(),
   noCoinAttempt: 0,
+
+  //songs played counter
+  totalSongsPlayed: (() => {
+    const saved = localStorage.getItem("jukebox_songs_played");
+    return saved !== null ? Number(saved) : 0;
+  })(),
 };
 
 const playerSlice = createSlice({
@@ -51,7 +57,9 @@ const playerSlice = createSlice({
       state.currentIndex = index;
       state.isPlaying = true;
       state.coins -= 1;
+      state.totalSongsPlayed += 1;
       localStorage.setItem("jukebox_coins", state.coins);
+      localStorage.setItem("jukebox_songs_played", state.totalSongsPlayed);
     },
 
     //play/pause
@@ -75,7 +83,9 @@ const playerSlice = createSlice({
       state.currentSong = state.songs[next];
       state.isPlaying = true;
       state.coins -= 1;
+      state.totalSongsPlayed += 1;
       localStorage.setItem("jukebox_coins", state.coins);
+      localStorage.setItem("jukebox_songs_played", state.totalSongsPlayed);
     },
 
     prevSong: (state) => {
@@ -91,7 +101,9 @@ const playerSlice = createSlice({
       state.currentSong = state.songs[prev];
       state.isPlaying = true;
       state.coins -= 1;
+      state.totalSongsPlayed += 1;
       localStorage.setItem("jukebox_coins", state.coins);
+      localStorage.setItem("jukebox_songs_played", state.totalSongsPlayed);
     },
 
     //toggle video/vinyl view
@@ -101,6 +113,14 @@ const playerSlice = createSlice({
 
     setShowVideo: (state, action) => {
       state.showVideo = action.payload;
+    },
+
+    //sync coins and played from backend profile
+    syncProfile: (state, action) => {
+      state.coins = action.payload.coins;
+      state.totalSongsPlayed = action.payload.totalSongsPlayed;
+      localStorage.setItem("jukebox_coins", state.coins);
+      localStorage.setItem("jukebox_songs_played", state.totalSongsPlayed);
     },
 
     //coins
@@ -151,6 +171,7 @@ const playerSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(logout, () => {
       localStorage.removeItem("jukebox_coins");
+      localStorage.removeItem("jukebox_songs_played");
       return initialState;
     });
   },
@@ -165,6 +186,7 @@ export const {
   prevSong,
   toggleVideo,
   setShowVideo,
+  syncProfile,
   addCoins,
   spendCoin,
   setActivePlaylist,

@@ -44,7 +44,7 @@ const QuizGame = ({ isActive, coins, onAddCoins, onClose }) => {
   const [error, setError] = useState(null);
   const coinTimers = useRef([]);
 
-  // Reset all state when quiz is opened
+  // reset stats when quiz coins game is opened
   useEffect(() => {
     if (isActive) {
       setScreen("intro");
@@ -108,7 +108,7 @@ const QuizGame = ({ isActive, coins, onAddCoins, onClose }) => {
     }
   };
 
-  // Handle answer selection — 3x blink on correct answer
+  // on correct answer — 3 times blink 
   const handleAnswer = (answer) => {
     if (flashState) return;
     const current = questions[currentIndex];
@@ -139,12 +139,12 @@ const QuizGame = ({ isActive, coins, onAddCoins, onClose }) => {
     }, 1000);
   };
 
-  // Results calculations
+  // result calculations
   const correctCount = answers.filter((a) => a.isCorrect).length;
   const wrongCount = answers.filter((a) => !a.isCorrect).length;
   const coinsWon = correctCount * (COINS_PER_DIFFICULTY[difficulty] || 0);
 
-  // Add coins one by one with sound when results appear
+  // add coins with sound when quiz complete and save to backend
   useEffect(() => {
     if (screen === "results" && coinsWon > 0 && !coinsAdded) {
       setCoinsAdded(true);
@@ -156,8 +156,17 @@ const QuizGame = ({ isActive, coins, onAddCoins, onClose }) => {
         }, i * 250);
         coinTimers.current.push(timer);
       }
+
+      // Save quiz result and coins to backend
+      quizService.submitResult({
+        category: questions[0]?.category || "",
+        difficulty,
+        correctAnswers: correctCount,
+        wrongAnswers: wrongCount,
+        coinsEarned: coinsWon,
+      }).catch(() => {});
     }
-  }, [screen, coinsWon, coinsAdded, onAddCoins]);
+  }, [screen, coinsWon, coinsAdded, onAddCoins, difficulty, correctCount, wrongCount, questions]);
 
   // Play Again resets to difficulty
   const handlePlayAgain = () => {
@@ -175,7 +184,7 @@ const QuizGame = ({ isActive, coins, onAddCoins, onClose }) => {
     setScreen("difficulty");
   };
 
-  // --- SCREENS ---
+  // --- All screens---
 
   const renderIntro = () => (
     <div className="quiz-game__screen">
@@ -290,11 +299,11 @@ const QuizGame = ({ isActive, coins, onAddCoins, onClose }) => {
         <div className="quiz-game__answers">
           {shuffledOptions.map((answer, i) => {
             let modifier = "";
-            // Correct answer always blinks 3x (whether user picked it or not)
+            // correcet answer blink 3 times
             if (flashState && answer === current.correctAnswer) {
               modifier = " quiz-game__answer--blink";
             }
-            // Wrong selection gets solid red (overrides blink)
+            // wron answer red color
             if (flashState === "wrong" && answer === selectedAnswer) {
               modifier = " quiz-game__answer--wrong";
             }
@@ -314,7 +323,7 @@ const QuizGame = ({ isActive, coins, onAddCoins, onClose }) => {
       </div>
     );
   };
-
+  // quiz coins game statistic
   const renderResults = () => (
     <div className="quiz-game__screen">
       <h3 className="quiz-game__title">Quiz Complete!</h3>
@@ -343,7 +352,7 @@ const QuizGame = ({ isActive, coins, onAddCoins, onClose }) => {
     </div>
   );
 
-  // --- RENDER ---
+  // --- render screens ---
 
   const renderScreen = () => {
     switch (screen) {

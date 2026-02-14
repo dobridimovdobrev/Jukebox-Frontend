@@ -37,6 +37,11 @@ const quizService = {
     const response = await api.delete(`/quiz/${id}`);
     return response.data;
   },
+
+  submitResult: async (request) => {
+    const response = await api.post("/userquizhistory", request);
+    return response.data;
+  },
 };
 
 export default quizService;

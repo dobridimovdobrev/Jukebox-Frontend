@@ -1,4 +1,4 @@
-const cleanTitle = (title) => title.replace(/["()'\/]/g, "").replace(/\s+/g, " ").trim();
+const cleanTitle = (title) => title.replace(/["()'/]/g, "").replace(/\s+/g, " ").trim();
 
 const formatDuration = (seconds) => {
   if (!seconds && seconds !== 0) return "—";

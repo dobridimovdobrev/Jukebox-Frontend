@@ -5,6 +5,7 @@ import {
   togglePlay,
   nextSong,
   prevSong,
+  syncProfile,
   addCoins as addCoinsAction,
   spendCoin,
   setShowVideo as setShowVideoAction,
@@ -12,6 +13,7 @@ import {
 } from "@/redux/playerSlice";
 import { logout } from "@/redux/authSlice";
 import playlistService from "@/services/playlistService";
+import userService from "@/services/userService";
 import "@/components/Shared/JukeboxLayout/JukeboxLayout.scss";
 import Header from "@/components/Shared/Header/Header";
 import "@/components/Shared/Header/Header.scss";
@@ -30,22 +32,21 @@ const JukeboxLayout = () => {
   const location = useLocation();
   const dispatch = useDispatch();
 
-  // Redux state (single source of truth for playback + coins)
+  // redux state
   const isPlaying = useSelector((s) => s.player.isPlaying);
   const showVideo = useSelector((s) => s.player.showVideo);
   const coins = useSelector((s) => s.player.coins);
   const currentSong = useSelector((s) => s.player.currentSong);
   const noCoinAttempt = useSelector((s) => s.player.noCoinAttempt);
 
-  // Flip state: derived from URL, but decoupled during animation
+  // state for animation
   const [isAnimatingToHome, setIsAnimatingToHome] = useState(false);
   const isFlipped = location.pathname.startsWith("/settings") && !isAnimatingToHome;
 
-  /* Local UI states */
+  /* other user interface states */
   const [isHomeShaking, setIsHomeShaking] = useState(false);
   const [isSettingsShaking, setIsSettingsShaking] = useState(false);
   const [isQuizShaking, setIsQuizShaking] = useState(false);
-  const [lightOn, setLightOn] = useState(true);
   const [isQuizActive, setIsQuizActive] = useState(false);
   const [isWizardActive, setIsWizardActive] = useState(false);
   const [isPlaylistOpen, setIsPlaylistOpen] = useState(false);
@@ -55,22 +56,26 @@ const JukeboxLayout = () => {
   const playerRef = useRef(null);
   const layoutRef = useRef(null);
 
-  // Sync YouTube iframe with Redux isPlaying state
+  // sync iframe with redux isPlaying state
   useEffect(() => {
     if (playerRef.current) {
       playerRef.current.controlYouTube(isPlaying ? "play" : "pause");
     }
   }, [isPlaying]);
 
-  // Watch for no-coin play attempts → trigger quiz shake
+  // if no coin shaking animation on quiz coins
   useEffect(() => {
     if (noCoinAttempt > 0) {
-      setIsQuizShaking(true);
-      setTimeout(() => setIsQuizShaking(false), 500);
+      const startTimer = setTimeout(() => setIsQuizShaking(true), 0);
+      const endTimer = setTimeout(() => setIsQuizShaking(false), 500);
+      return () => {
+        clearTimeout(startTimer);
+        clearTimeout(endTimer);
+      };
     }
   }, [noCoinAttempt]);
 
-  // Fetch user's playlists on mount
+  // fetch playlist generate
   useEffect(() => {
     const fetchPlaylists = async () => {
       try {
@@ -83,18 +88,25 @@ const JukeboxLayout = () => {
     fetchPlaylists();
   }, [dispatch]);
 
-  /* Lights function turn on, turn off */
-  const handleLights = () => {
-    setLightOn(!lightOn);
-  };
+  // sync coins and played from backend
+  useEffect(() => {
+    userService.getProfile()
+      .then((data) => {
+        dispatch(syncProfile({
+          coins: data.coins ?? 5,
+          totalSongsPlayed: data.totalSongsPlayed ?? 0,
+        }));
+      })
+      .catch(() => {});
+  }, [dispatch]);
 
-  /* Rotation 180 deg on click Home icon from main navigation */
+  // rotaion 180 deg from main navigation
   const handleFlipToHome = () => {
     if (!location.pathname.startsWith("/settings")) {
       setIsHomeShaking(true);
       setTimeout(() => setIsHomeShaking(false), 500);
     } else {
-      // Start CSS flip animation, navigate only after transition ends
+      // rotate animation
       setIsAnimatingToHome(true);
 
       const onTransitionEnd = (e) => {
@@ -109,7 +121,7 @@ const JukeboxLayout = () => {
     }
   };
 
-  /* Rotation 180 deg on click Settings icon from main navigation */
+  // rotaion 180 deg for settings this is the backoffice
   const handleFlipToSettings = () => {
     if (isFlipped) {
       setIsSettingsShaking(true);
@@ -119,19 +131,18 @@ const JukeboxLayout = () => {
     }
   };
 
-  /* Insert coin: no manual increment, only shake quiz icon to prompt user to play */
+  // no manual coin increment on click shake animation on quiz couins
   const handleInsertCoin = () => {
     setIsQuizShaking(true);
     setTimeout(() => setIsQuizShaking(false), 500);
   };
 
-  /* Add coins earned from quiz */
+  // increment coins from quiz coins play
   const handleAddCoins = (amount) => {
     dispatch(addCoinsAction(amount));
   };
 
-  /* Only one center-player overlay active at a time.
-     Close all others, then open the new one immediately (cross-fade). */
+    // one center play on artist at time
   const openOverlay = (openFn) => {
     setIsQuizActive(false);
     setIsWizardActive(false);
@@ -140,7 +151,7 @@ const JukeboxLayout = () => {
     openFn();
   };
 
-  /* Quiz game open/close */
+  // quiz game open / close
   const handleStartQuiz = () => {
     openOverlay(() => setIsQuizActive(true));
   };
@@ -149,7 +160,7 @@ const JukeboxLayout = () => {
     setIsQuizActive(false);
   };
 
-  /* Playlist wizard open/close */
+  /* playlist open / close */
   const handleStartWizard = () => {
     openOverlay(() => setIsWizardActive(true));
   };
@@ -158,23 +169,23 @@ const JukeboxLayout = () => {
     setIsWizardActive(false);
   };
 
-  /* Logout confirm */
+  // confirm message on logout
   const handleLogoutClick = (e) => {
     e.preventDefault();
     openOverlay(() => setIsLogoutOpen(true));
   };
-
+  // logout confirmation
   const handleLogoutConfirm = () => {
     setIsLogoutOpen(false);
     dispatch(logout());
     navigate("/login");
   };
 
-  /* Audio/Video Control buttons */
+  // audio video controls for the player
   const handlePlayPause = () => {
     if (!currentSong) return;
     if (!isPlaying && coins <= 0) {
-      // Trying to resume with no coins → shake
+      // shake naimation
       setIsQuizShaking(true);
       setTimeout(() => setIsQuizShaking(false), 500);
       return;
@@ -235,7 +246,6 @@ const JukeboxLayout = () => {
         <div ref={layoutRef} className={`jukebox-layout ${isFlipped ? "flipped" : ""}`}>
           <div className={`jukebox-layout__front ${isHomeShaking ? "shake" : ""}`}>
             <HomeContent
-              lightOn={lightOn}
               isPlaying={isPlaying}
               showVideo={showVideo}
               playerRef={playerRef}
