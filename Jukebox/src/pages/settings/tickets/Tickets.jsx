@@ -41,7 +41,7 @@ const mapBackendTicket = (t) => ({
   subject: t.title,
   description: t.description,
   category: t.category,
-  priority: t.priority,
+  priority: t.priority?.toLowerCase(),
   status: t.status,
   attachment: t.attachmentUrl,
   createdBy: t.userFullName || "User",
@@ -91,7 +91,11 @@ const Tickets = () => {
       } else {
         data = await ticketService.getMy();
       }
-      const mapped = (Array.isArray(data) ? data : []).map(mapBackendTicket);
+      const userName = user ? `${user.firstName} ${user.lastName}` : "User";
+      const mapped = (Array.isArray(data) ? data : []).map((t) => ({
+        ...mapBackendTicket(t),
+        createdBy: t.userFullName || userName,
+      }));
       setTickets(mapped);
     } catch (err) {
       console.error("Failed to fetch tickets:", err);
@@ -199,6 +203,7 @@ const Tickets = () => {
             onSave: handleSave,
             onAdminAction: handleAdminAction,
             onCancel: handleCancel,
+            onRefresh: fetchTickets,
           }}
         />
       </div>

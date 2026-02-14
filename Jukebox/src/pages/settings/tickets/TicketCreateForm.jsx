@@ -1,6 +1,8 @@
 import { useState, useRef } from "react";
 import { useOutletContext } from "react-router-dom";
 import CustomDropdownSelect from "@/components/Shared/CustomDropdownSelect";
+import compressImage from "@/utils/compressImage";
+import uploadService from "@/services/uploadService";
 
 const CATEGORY_OPTIONS = [
   { value: "Bug Report", label: "Bug Report" },
@@ -42,7 +44,7 @@ const TicketCreateForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
@@ -52,14 +54,14 @@ const TicketCreateForm = () => {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const dataUrl = event.target.result;
-      setFormData({ ...formData, attachment: dataUrl });
-      setAttachmentPreview(dataUrl);
+    try {
+      const compressed = await compressImage(file);
+      setFormData({ ...formData, attachment: compressed });
+      setAttachmentPreview(compressed);
       setErrors({ ...errors, attachment: undefined });
-    };
-    reader.readAsDataURL(file);
+    } catch {
+      setErrors({ ...errors, attachment: "Failed to process image" });
+    }
   };
 
   const handleRemoveAttachment = () => {
@@ -73,7 +75,13 @@ const TicketCreateForm = () => {
     if (validate()) {
       setSubmitting(true);
       try {
-        await onSave(formData);
+        let attachmentUrl = null;
+        if (formData.attachment) {
+          attachmentUrl = await uploadService.uploadImage(formData.attachment);
+        }
+        await onSave({ ...formData, attachment: attachmentUrl });
+      } catch (err) {
+        console.error("Failed to create ticket:", err);
       } finally {
         setSubmitting(false);
       }

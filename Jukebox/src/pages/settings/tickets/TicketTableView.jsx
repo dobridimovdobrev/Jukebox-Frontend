@@ -18,12 +18,16 @@ const formatDate = (dateStr) => {
 
 const TicketTableView = ({
   tickets,
+  currentRole,
   onView,
   onDelete,
   loadMoreRef,
   hasMore,
   loadingMore,
 }) => {
+  const isAdmin = currentRole === "admin";
+  const colSpan = isAdmin ? 8 : 7;
+
   return (
     <div className="table-container">
       <table className="table settings-table">
@@ -34,7 +38,7 @@ const TicketTableView = ({
             <th>Category</th>
             <th>Priority</th>
             <th>Status</th>
-            <th>Author</th>
+            {isAdmin && <th>Author</th>}
             <th>Created</th>
             <th>Actions</th>
           </tr>
@@ -42,7 +46,7 @@ const TicketTableView = ({
         <tbody>
           {tickets.length === 0 ? (
             <tr>
-              <td colSpan="8" className="text-center">
+              <td colSpan={colSpan} className="text-center">
                 No tickets found.
               </td>
             </tr>
@@ -70,33 +74,47 @@ const TicketTableView = ({
                       {STATUS_LABELS[ticket.status]}
                     </span>
                   </td>
-                  <td>{ticket.createdBy}</td>
+                  {isAdmin && <td>{ticket.createdBy}</td>}
                   <td className="ticket-date-cell">
                     {formatDate(ticket.createdAt)}
                   </td>
-                  <td>
-                    <div className="table-actions">
-                      <button
-                        className="btn-icon"
-                        onClick={() => onView(ticket)}
-                        title="View"
-                      >
-                        👁
-                      </button>
-                      <button
-                        className="btn-icon btn-icon--danger"
-                        onClick={() => onDelete(ticket)}
-                        title="Delete"
-                      >
-                        🗑️
-                      </button>
-                    </div>
-                  </td>
+                  {isAdmin ? (
+                    <td>
+                      <div className="table-actions">
+                        <button
+                          className="btn-icon"
+                          onClick={() => onView(ticket)}
+                          title="View"
+                        >
+                          👁
+                        </button>
+                        <button
+                          className="btn-icon btn-icon--danger"
+                          onClick={() => onDelete(ticket)}
+                          title="Delete"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </td>
+                  ) : (
+                    <td>
+                      <div className="table-actions">
+                        <button
+                          className="btn-icon"
+                          onClick={() => onView(ticket)}
+                          title="View"
+                        >
+                          👁
+                        </button>
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))}
               {loadingMore && hasMore && (
                 <tr>
-                  <td colSpan="8" className="text-center loading-more">
+                  <td colSpan={colSpan} className="text-center loading-more">
                     Loading...
                   </td>
                 </tr>
