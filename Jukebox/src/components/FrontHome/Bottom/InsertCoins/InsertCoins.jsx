@@ -1,6 +1,6 @@
 import "@/components/FrontHome/Bottom/InsertCoins/InsertCoins.scss";
-import CoinsImage from "@/assets/insert-coins.png";
-import Logo from "@/assets/catsofy.png";
+import CoinsImage from "@/assets/insert-coins.webp";
+import Logo from "@/assets/catsofy.webp";
 
 const InsertCoins = ({ coins = 5, onInsertCoin, isInsertCoinFlipped }) => {
   return (

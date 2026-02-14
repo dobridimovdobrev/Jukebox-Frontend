@@ -12,7 +12,6 @@ import { setSongs, setActiveArtist, setArtists as setArtistsAction, playSong } f
 const Artist = () => {
   const dispatch = useDispatch();
   const activeArtistId = useSelector((s) => s.player.activeArtistId);
-  const coins = useSelector((s) => s.player.coins);
   const [artists, setArtists] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -56,7 +55,7 @@ const Artist = () => {
       }
     };
     fetchArtists();
-  }, []);
+  }, [dispatch, activeArtistId]);
 
   // On artist click → fetch their songs and dispatch to Redux
   const handleArtistClick = async (artist) => {
@@ -84,14 +83,9 @@ const Artist = () => {
 
       dispatch(setSongs(allSongs));
 
-      // Auto-play first song (triggers vinyl, visualizer, deducts coin)
+      // Auto-play first song only if user has coins
       if (allSongs.length > 0) {
         dispatch(playSong({ song: allSongs[0], index: 0 }));
-        if (coins > 0) {
-          songService.incrementPlayCount(allSongs[0].songId).catch((err) => {
-            console.error("Failed to increment play count:", err);
-          });
-        }
       }
     } catch (err) {
       console.error("Failed to fetch songs for artist:", err);

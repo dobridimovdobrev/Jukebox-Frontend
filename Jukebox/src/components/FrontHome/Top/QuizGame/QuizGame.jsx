@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import quizService from "@/services/quizService";
-import dropCoinSfx from "@/assets/drop-coin.mp3";
-import vinylBg from "@/assets/new-vinyl-background.png";
+import dropCoinSfx from "@/assets/sounds/drop-coin.mp3";
+import vinylBg from "@/assets/new-vinyl-background.webp";
 
 const COINS_PER_DIFFICULTY = { Easy: 2, Medium: 3, Hard: 5 };
 

@@ -10,7 +10,7 @@ import {
 } from "@/redux/playerSlice";
 import playlistService from "@/services/playlistService";
 import artistService from "@/services/artistService";
-import vinylBg from "@/assets/new-vinyl-background.png";
+import vinylBg from "@/assets/new-vinyl-background.webp";
 
 const PlaylistWizard = ({ isActive, onClose }) => {
   const dispatch = useDispatch();

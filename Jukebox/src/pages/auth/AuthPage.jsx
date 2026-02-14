@@ -4,7 +4,7 @@ import { useNavigate, Navigate } from "react-router-dom";
 import { loginUser, registerUser, clearError } from "@/redux/authSlice";
 import CustomDropdownSelect from "@/components/Shared/CustomDropdownSelect";
 import countryService from "@/services/countryService";
-import bglogin from "@/assets/bglogin.png";
+import bglogin from "@/assets/bglogin.webp";
 import "@/pages/auth/AuthPage.scss";
 
 const GENDER_OPTIONS = [

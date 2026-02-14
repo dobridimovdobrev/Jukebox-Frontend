@@ -9,9 +9,9 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { nextSong, pause } from "@/redux/playerSlice";
 import songService from "@/services/songService";
-import VinylDisc from "@/assets/retro-vinyl-disc.png";
-import VinylBackground from "@/assets/new-vinyl-background.png";
-import Braccio from "@/assets/braccio.png";
+import VinylDisc from "@/assets/retro-vinyl-disc.webp";
+import VinylBackground from "@/assets/new-vinyl-background.webp";
+import Braccio from "@/assets/braccio.webp";
 
 // Singleton: load YouTube IFrame API script once
 let ytApiPromise = null;
