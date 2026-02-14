@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Outlet, useNavigate, useMatch } from "react-router-dom";
 import { useSelector } from "react-redux";
 import "@/pages/settings/tickets/Tickets.scss";
@@ -81,7 +81,7 @@ const Tickets = () => {
   const [ticketToDelete, setTicketToDelete] = useState(null);
 
   // Fetch tickets from backend
-  const fetchTickets = async () => {
+  const fetchTickets = useCallback(async () => {
     try {
       setLoading(true);
       let data;
@@ -103,11 +103,11 @@ const Tickets = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentRole, user]);
 
   useEffect(() => {
     fetchTickets();
-  }, [currentRole]);
+  }, [fetchTickets]);
 
   // Filter
   const filteredTickets = tickets.filter((ticket) => {
