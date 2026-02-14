@@ -6,7 +6,7 @@ import AuthPage from "@/pages/auth/AuthPage";
 import ProtectedRoute from "@/components/Shared/ProtectedRoute";
 import AdminRoute from "@/components/Shared/AdminRoute";
 
-// Settings pages
+// settings pages
 import Dashboard from "@/pages/settings/dashboard/Dashboard";
 import Artists from "@/pages/settings/artists/Artists";
 import ArtistForm from "@/pages/settings/artists/ArtistForm";
@@ -23,7 +23,7 @@ import Tickets from "@/pages/settings/tickets/Tickets";
 import TicketCreateForm from "@/pages/settings/tickets/TicketCreateForm";
 import TicketDetail from "@/pages/settings/tickets/TicketDetail";
 
-// Redirect /settings to the correct default page based on role
+// redirect pages in my backoffice based on roles
 const ADMIN_ROLES = ["SuperAdmin"];
 const SettingsRedirect = () => {
   const { user } = useSelector((state) => state.auth);
@@ -35,17 +35,17 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Auth page — standalone, outside JukeboxLayout */}
+        {/* authentication page */}
         <Route path="/login" element={<AuthPage />} />
 
-        {/* Protected routes — redirect to /login if not authenticated */}
+        {/* redirect login if not authenticated */}
         <Route element={<ProtectedRoute />}>
           <Route path="/*" element={<JukeboxLayout />}>
-          {/* Settings routes nested under SettingsContent layout */}
+          {/* nested routes for setting layout*/}
           <Route path="settings" element={<SettingsContent />}>
             <Route index element={<SettingsRedirect />} />
 
-            {/* Admin-only routes */}
+            {/* My superadmin routes*/}
             <Route element={<AdminRoute />}>
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="quiz" element={<Quiz />}>
@@ -53,12 +53,11 @@ function App() {
                 <Route path="update/:id" element={<QuizForm />} />
               </Route>
               <Route path="users" element={<Users />}>
-                <Route path="create" element={<UsersForm />} />
-                <Route path="update/:id" element={<UsersForm />} />
+                <Route path="view/:id" element={<UsersForm />} />
               </Route>
             </Route>
 
-            {/* Shared routes (all authenticated users) */}
+            {/* Shared routes for superadmin and user */}
             <Route path="profile" element={<Profile />} />
             <Route path="artists" element={<Artists />}>
               <Route path="create" element={<ArtistForm />} />

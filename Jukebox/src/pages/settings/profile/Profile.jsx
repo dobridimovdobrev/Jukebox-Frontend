@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import "@/pages/settings/profile/Profile.scss";
 import userService from "@/services/userService";
 import countryService from "@/services/countryService";
@@ -9,8 +10,9 @@ const GENDER_OPTIONS = [
   { value: "male", label: "Male" },
   { value: "female", label: "Female" },
 ];
-
+// states
 const Profile = () => {
+  const coins = useSelector((s) => s.player.coins);
   const [successMessage, showSuccess] = useSuccessMessage();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -48,7 +50,7 @@ const Profile = () => {
         });
         setReadOnly({
           email: data.email || "",
-          role: data.role || "User",
+          role: data.roles?.join(", ") || data.role || "User",
           coins: data.coins ?? 0,
           totalSongsPlayed: data.totalSongsPlayed ?? 0,
           createdAt: data.createdAt || "",
@@ -70,7 +72,7 @@ const Profile = () => {
       })
       .catch(() => setCountryOptions([]));
   }, []);
-
+  // validation
   const validate = () => {
     const newErrors = {};
     if (!formData.firstName.trim()) newErrors.firstName = "First name is required";
@@ -78,7 +80,7 @@ const Profile = () => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
+  // update profile
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
@@ -150,7 +152,7 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* Email (read-only) + Role (read-only) */}
+          {/* email adnr role read only */}
           <div className="settings-form__row">
             <div className="settings-form__group">
               <label className="settings-form__label">Email</label>
@@ -172,7 +174,7 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* Gender + Country */}
+          {/*gender and country */}
           <div className="settings-form__row">
             <div className="settings-form__group">
               <label className="settings-form__label">Gender</label>
@@ -195,7 +197,7 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* Birthday + Registered (read-only) */}
+          {/* birthday */}
           <div className="settings-form__row">
             <div className="settings-form__group">
               <label className="settings-form__label">Birthday</label>
@@ -206,6 +208,7 @@ const Profile = () => {
                 onChange={(e) => setFormData({ ...formData, birthday: e.target.value })}
               />
             </div>
+            {/* registerd date */}
             <div className="settings-form__group">
               <label className="settings-form__label">Registered</label>
               <input
@@ -217,14 +220,14 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* Coins + Songs Played (read-only) */}
+          {/* coins and songs */}
           <div className="settings-form__row">
             <div className="settings-form__group">
               <label className="settings-form__label">Coins</label>
               <input
                 type="text"
                 className="settings-form__input"
-                value={readOnly.coins}
+                value={coins}
                 disabled
               />
             </div>
@@ -239,7 +242,7 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* Save */}
+          {/* save button */}
           <div className="settings-form__actions">
             <button
               type="submit"

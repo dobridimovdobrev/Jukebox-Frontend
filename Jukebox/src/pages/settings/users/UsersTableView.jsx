@@ -5,16 +5,10 @@ const getRoleBadge = (role) => {
   };
   return classes[role] || "badge-role";
 };
-
-const formatBirthday = (dateStr) => {
-  if (!dateStr) return "—";
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
-};
-
+// user table view function with props
 const UsersTableView = ({
   users,
-  onEdit,
+  onView,
   onDelete,
   onToggleActive,
   loadMoreRef,
@@ -28,12 +22,12 @@ const UsersTableView = ({
           <tr>
             <th className="col-number">#</th>
             <th>Name</th>
-            <th>Username</th>
             <th>Email</th>
-            <th>Birthday</th>
             <th>Role</th>
             <th>Status</th>
             <th>Country</th>
+            <th>Coins</th>
+            <th>Played</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -41,7 +35,7 @@ const UsersTableView = ({
           {users.length === 0 ? (
             <tr>
               <td colSpan="9" className="text-center">
-                No users found. Add one manually.
+                No users found.
               </td>
             </tr>
           ) : (
@@ -53,9 +47,7 @@ const UsersTableView = ({
                 >
                   <td className="col-number">{index + 1}</td>
                   <td>{user.firstName} {user.lastName}</td>
-                  <td className="user-username">{user.username}</td>
                   <td className="user-email">{user.email}</td>
-                  <td className="user-birthday">{formatBirthday(user.birthday)}</td>
                   <td>
                     <span className={getRoleBadge(user.role)}>
                       {user.role}
@@ -73,6 +65,8 @@ const UsersTableView = ({
                     </span>
                   </td>
                   <td>{user.country || "—"}</td>
+                  <td>{user.coins ?? 0}</td>
+                  <td>{user.totalSongsPlayed ?? 0}</td>
                   <td>
                     <div className="table-actions">
                       <button
@@ -84,10 +78,10 @@ const UsersTableView = ({
                       </button>
                       <button
                         className="btn-icon"
-                        onClick={() => onEdit(user)}
-                        title="Edit"
+                        onClick={() => onView(user)}
+                        title="View"
                       >
-                        ✏️
+                        👁
                       </button>
                       <button
                         className="btn-icon btn-icon--danger"

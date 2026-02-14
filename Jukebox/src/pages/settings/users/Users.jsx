@@ -14,6 +14,7 @@ const STATUS_FILTER_OPTIONS = [
   { value: "inactive", label: "Inactive" },
 ];
 
+// max 30 items fort page
 const PAGE_SIZE = 30;
 
 const Users = () => {
@@ -103,7 +104,7 @@ const Users = () => {
 
   const handleFilterChange = (setter) => (e) => setter(e.target.value);
 
-  const handleEdit = (user) => navigate(`update/${user.userId}`);
+  const handleView = (user) => navigate(`view/${user.userId}`);
 
   const handleSave = async (userData, userId) => {
     try {
@@ -173,7 +174,7 @@ const Users = () => {
           <span className="badge-count">{totalItems} users</span>
         </div>
       </div>
-
+      {/*  user filters */}
       <div className="users__filters">
         <input
           type="text"
@@ -182,16 +183,17 @@ const Users = () => {
           value={searchTerm}
           onChange={handleFilterChange(setSearchTerm)}
         />
+        {/* my dropdown select for all select inputs */}
         <CustomDropdownSelect
           value={filterStatus}
           onChange={handleFilterChange(setFilterStatus)}
           options={STATUS_FILTER_OPTIONS}
         />
       </div>
-
+        {/* users table view */}
       <UsersTableView
         users={users}
-        onEdit={handleEdit}
+        onView={handleView}
         onDelete={handleDeleteClick}
         onToggleActive={handleToggleActive}
         loadMoreRef={loadMoreRef}
@@ -199,7 +201,7 @@ const Users = () => {
         loadingMore={loadingMore}
         loading={loading}
       />
-
+        {/* delete modal */}
       <DeleteModal
         isOpen={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
