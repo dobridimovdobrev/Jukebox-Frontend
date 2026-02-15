@@ -4,14 +4,14 @@
   position: relative;
   min-width: 140px;
 
-  //some bootstrap ovverrides
+  // Override Bootstrap CSS variables that might cause blue
   --bs-dropdown-link-active-bg: transparent;
   --bs-dropdown-link-hover-bg: transparent;
   --bs-link-color: #{$gold};
   --bs-blue: #{$primary};
   --bs-primary: #{$primary};
 
-  // reset browser defaults i hate it
+  // Reset browser defaults and remove blue highlight
   *,
   *::before,
   *::after {
@@ -70,10 +70,10 @@
       transform: rotate(180deg);
     }
   }
-    // dropdown
+
   &__dropdown {
     position: absolute;
-    bottom: calc(100% + 4px);
+    top: calc(100% + 4px);
     left: 0;
     right: 0;
     z-index: 1000;
@@ -122,7 +122,7 @@
     max-height: 200px;
     overflow-y: auto;
 
-    // custom scroll
+    // Custom scrollbar
     &::-webkit-scrollbar {
       width: 6px;
     }
@@ -163,7 +163,7 @@
     -webkit-user-select: none;
     outline: none !important;
     border: none !important;
-    
+    // Kill ALL blue highlights
     -webkit-tap-highlight-color: transparent !important;
     -webkit-focus-ring-color: transparent !important;
 

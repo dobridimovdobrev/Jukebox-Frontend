@@ -23,7 +23,7 @@ import SongList from "@/components/FrontHome/Center/SongList/SongList";
 import "@/components/FrontHome/Center/SongList/SongList.scss";
 
 const HomeContent = ({
-  lightOn, isPlaying, showVideo, playerRef, isQuizShaking,
+  isPlaying, showVideo, playerRef, isQuizShaking,
   coins, onAddCoins, isQuizActive, onStartQuiz, onCloseQuiz,
   isWizardActive, onStartWizard, onCloseWizard,
   isPlaylistOpen, onClosePlaylist,
@@ -35,7 +35,7 @@ const HomeContent = ({
         {/* Left Panel */}
         <div className="home-content__left-quiz">
           {/* left lights */}
-          <Lights turnOn={lightOn} />
+          <Lights turnOn />
           {/* Quiz Coins */}
           <QuizCoins isShaking={isQuizShaking} isStartQuizCoins={onStartQuiz} />
         </div>
@@ -76,7 +76,7 @@ const HomeContent = ({
         {/* Right Panel */}
         <div className="home-content__right-playlist">
           {/* right lights */}
-          <Lights turnOn={lightOn} />
+          <Lights turnOn />
           {/* Quiz Playlist */}
           <QuizPlaylist onStartWizard={onStartWizard} />
         </div>

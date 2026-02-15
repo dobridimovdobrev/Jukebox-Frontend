@@ -13,6 +13,9 @@
     height: 14.2rem;
     margin-bottom: 6px;
     flex-shrink: 0;
+    position: relative;
+    z-index: 10;
+    overflow: visible;
   }
   // home quiz coins
   &__left-quiz {
@@ -28,10 +31,10 @@
     align-items: center;
     justify-content: center;
     perspective: 2000px;
-    overflow: hidden;
     border-radius: 6px;
     transform-style: flat;
     position: relative;
+    overflow: visible;
   }
   // home quiz playlist
   &__right-playlist {
@@ -43,6 +46,8 @@
   //home artists images with swiper
   &__center-top {
     flex-shrink: 0;
+    position: relative;
+    z-index: 0;
   }
   //home songlist
   &__center-bottom {
