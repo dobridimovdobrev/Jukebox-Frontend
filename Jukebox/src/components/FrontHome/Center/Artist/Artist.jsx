@@ -15,7 +15,7 @@ const Artist = () => {
   const [artists, setArtists] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  //fetch artists from backend - default is Elvis Presley
+  // fetch artist first is default
   useEffect(() => {
     const fetchArtists = async () => {
       try {
@@ -24,29 +24,25 @@ const Artist = () => {
         setArtists(items);
         dispatch(setArtistsAction(items));
 
-        // default load elvis songs if no artist is active
-        if (!activeArtistId) {
-          const elvis = items.find((a) =>
-            a.name.toLowerCase().includes("elvis")
-          );
-          if (elvis) {
-            dispatch(setActiveArtist(elvis.artistId));
-            const firstPage = await songService.getByArtist(elvis.artistId, {
+        //load first artist default on page reload
+        if (items.length > 0) {
+          const first = items[0];
+          dispatch(setActiveArtist(first.artistId));
+          const firstPage = await songService.getByArtist(first.artistId, {
+            PageSize: 100,
+            PageNumber: 1,
+          });
+          let allSongs = firstPage.items || [];
+          const total = firstPage.totalItems || allSongs.length;
+          const totalPages = Math.ceil(total / 100);
+          for (let page = 2; page <= totalPages; page++) {
+            const nextPage = await songService.getByArtist(first.artistId, {
               PageSize: 100,
-              PageNumber: 1,
+              PageNumber: page,
             });
-            let allSongs = firstPage.items || [];
-            const total = firstPage.totalItems || allSongs.length;
-            const totalPages = Math.ceil(total / 100);
-            for (let page = 2; page <= totalPages; page++) {
-              const nextPage = await songService.getByArtist(elvis.artistId, {
-                PageSize: 100,
-                PageNumber: page,
-              });
-              allSongs = [...allSongs, ...(nextPage.items || [])];
-            }
-            dispatch(setSongs(allSongs));
+            allSongs = [...allSongs, ...(nextPage.items || [])];
           }
+          dispatch(setSongs(allSongs));
         }
       } catch (err) {
         console.error("Failed to fetch artists:", err);
@@ -55,16 +51,16 @@ const Artist = () => {
       }
     };
     fetchArtists();
-  }, [dispatch, activeArtistId]);
+  }, [dispatch]);
 
-  // on artist click fetch their songs and dispatch to redux 
+  // on artist click fetch their song dispatch redux
   const handleArtistClick = async (artist) => {
     if (artist.artistId === activeArtistId) return;
 
     try {
       dispatch(setActiveArtist(artist.artistId));
 
-      // fetch all songs for this artist 
+      // fettch all songs artist if page > 100
       const firstPage = await songService.getByArtist(artist.artistId, {
         PageSize: 100,
         PageNumber: 1,
@@ -83,7 +79,7 @@ const Artist = () => {
 
       dispatch(setSongs(allSongs));
 
-      // atoplay first song only if user has coins
+      // auto play first song if user have coins
       if (allSongs.length > 0) {
         dispatch(playSong({ song: allSongs[0], index: 0 }));
       }
@@ -123,8 +119,8 @@ const Artist = () => {
         }}
         className="artist__swiper"
       >
-        {artists.map((artist) => (
-          <SwiperSlide key={artist.artistId}>
+        {artists.map((artist, index) => (
+          <SwiperSlide key={artist.artistId ?? `artist-${index}`}>
             <div
               className={`artist__box ${
                 artist.artistId === activeArtistId ? "artist__box--active" : ""
@@ -135,6 +131,10 @@ const Artist = () => {
                 className="artist__image"
                 src={artist.photo}
                 alt={artist.name}
+                width={80}
+                height={80}
+                loading="lazy"
+                decoding="async"
                 onError={(e) => {
                   e.target.src =
                     "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect fill='%23333' width='80' height='80'/%3E%3Ctext fill='%23C5A676' x='50%25' y='55%25' text-anchor='middle' font-size='12'%3E%3F%3C/text%3E%3C/svg%3E";

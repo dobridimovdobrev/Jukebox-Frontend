@@ -73,3 +73,27 @@
     opacity: 0;
   }
 }
+
+// song enter slide (used in SongList)
+@keyframes song-enter {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+// generating pulse (used in SongList)
+@keyframes generating-pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+    text-shadow: 0 0 8px rgba($primary, 0.5);
+  }
+}

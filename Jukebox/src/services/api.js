@@ -1,10 +1,12 @@
 import axios from "axios";
 
+export const API_HOST = "https://localhost:7183";
+
 const api = axios.create({
-  baseURL: "https://localhost:7183/api",
+  baseURL: `${API_HOST}/api`,
 });
 
-// JWT interceptor
+// jwt interceptor to not pass manually the token fo every backend endpoint request
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
@@ -20,7 +22,10 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      // optional: redirect to login
+      // Redirect to login (avoid redirect loop if already on login)
+      if (!window.location.pathname.includes("/login")) {
+        window.location.href = "/login";
+      }
     }
     return Promise.reject(error);
   }

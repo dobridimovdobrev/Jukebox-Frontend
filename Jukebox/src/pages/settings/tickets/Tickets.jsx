@@ -1,14 +1,13 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Outlet, useNavigate, useMatch } from "react-router-dom";
 import { useSelector } from "react-redux";
 import "@/pages/settings/tickets/Tickets.scss";
 import TicketTableView from "@/pages/settings/tickets/TicketTableView";
 import CustomDropdownSelect from "@/components/Shared/CustomDropdownSelect";
 import DeleteModal from "@/components/Shared/DeleteModal";
-import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 import ticketService from "@/services/ticketService";
 import useSuccessMessage from "@/hooks/useSuccessMessage";
-
+// all ticke statuses
 const STATUS_FILTER_OPTIONS = [
   { value: "all", label: "All Statuses" },
   { value: "open", label: "Open" },
@@ -16,14 +15,14 @@ const STATUS_FILTER_OPTIONS = [
   { value: "answered", label: "Answered" },
   { value: "closed", label: "Closed" },
 ];
-
+// ticket system prioriry
 const PRIORITY_FILTER_OPTIONS = [
   { value: "all", label: "All Priorities" },
   { value: "low", label: "Low" },
   { value: "medium", label: "Medium" },
   { value: "high", label: "High" },
 ];
-
+// ticket system categories i will imporve in future from backend
 const CATEGORY_FILTER_OPTIONS = [
   { value: "all", label: "All Categories" },
   { value: "Bug Report", label: "Bug Report" },
@@ -32,8 +31,9 @@ const CATEGORY_FILTER_OPTIONS = [
   { value: "Playback Issue", label: "Playback Issue" },
   { value: "General", label: "General" },
 ];
-
+// 30 tickets per page with scroll infinity hook and lazy loading
 const ADMIN_ROLES = ["SuperAdmin"];
+const PAGE_SIZE = 30;
 
 // Map backend response to local format
 const mapBackendTicket = (t) => ({
@@ -67,72 +67,123 @@ const Tickets = () => {
 
   const [successMessage, showSuccess] = useSuccessMessage();
 
-  // States
+  // ticket data
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const [totalItems, setTotalItems] = useState(0);
+  const [pageNumber, setPageNumber] = useState(1);
+
   const currentRole = isAdmin ? "admin" : "user";
+
+  // ticket filters
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterPriority, setFilterPriority] = useState("all");
   const [filterCategory, setFilterCategory] = useState("all");
 
-  // Delete dialog
+  //delete dialog
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [ticketToDelete, setTicketToDelete] = useState(null);
 
-  // Fetch tickets from backend
-  const fetchTickets = useCallback(async () => {
-    try {
-      setLoading(true);
-      let data;
-      if (currentRole === "admin") {
-        const result = await ticketService.search({ PageSize: 100 });
-        data = result.items || result;
-      } else {
-        data = await ticketService.getMy();
+  const observerRef = useRef(null);
+
+  // search term
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchTerm), 400);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  const userName = user ? `${user.firstName} ${user.lastName}` : "User";
+
+  // fetch tickets from backend
+  const fetchTickets = useCallback(
+    async (page = 1, append = false) => {
+      try {
+        if (page === 1) setLoading(true);
+        else setLoadingMore(true);
+
+        if (isAdmin) {
+          // pagination with filtering
+          const params = { PageNumber: page, PageSize: PAGE_SIZE };
+          if (debouncedSearch) params.Title = debouncedSearch;
+          if (filterStatus !== "all") params.Status = filterStatus;
+          if (filterPriority !== "all") params.Priority = filterPriority;
+          if (filterCategory !== "all") params.Category = filterCategory;
+
+          const data = await ticketService.search(params);
+          const mapped = (data.items || []).map((t) => ({
+            ...mapBackendTicket(t),
+            createdBy: t.userFullName || userName,
+          }));
+
+          if (append) {
+            setTickets((prev) => [...prev, ...mapped]);
+          } else {
+            setTickets(mapped);
+          }
+          setTotalItems(data.totalItems);
+          setHasMore(data.hasNextPage);
+          setPageNumber(page);
+        } else {
+          // backend pagiantion
+          const data = await ticketService.getMy();
+          const mapped = (Array.isArray(data) ? data : []).map((t) => ({
+            ...mapBackendTicket(t),
+            createdBy: t.userFullName || userName,
+          }));
+          setTickets(mapped);
+          setTotalItems(mapped.length);
+          setHasMore(false);
+        }
+      } catch (err) {
+        console.error("Failed to fetch tickets:", err);
+        setTickets([]);
+      } finally {
+        setLoading(false);
+        setLoadingMore(false);
       }
-      const userName = user ? `${user.firstName} ${user.lastName}` : "User";
-      const mapped = (Array.isArray(data) ? data : []).map((t) => ({
-        ...mapBackendTicket(t),
-        createdBy: t.userFullName || userName,
-      }));
-      setTickets(mapped);
-    } catch (err) {
-      console.error("Failed to fetch tickets:", err);
-      setTickets([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [currentRole, user]);
+    },
+    [isAdmin, debouncedSearch, filterStatus, filterPriority, filterCategory, userName],
+  );
 
   useEffect(() => {
-    fetchTickets();
+    fetchTickets(1, false);
   }, [fetchTickets]);
 
-  // Filter
-  const filteredTickets = tickets.filter((ticket) => {
-    const matchesSearch = ticket.subject
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      filterStatus === "all" || ticket.status === filterStatus;
-    const matchesPriority =
-      filterPriority === "all" || ticket.priority === filterPriority;
-    const matchesCategory =
-      filterCategory === "all" || ticket.category === filterCategory;
-    return matchesSearch && matchesStatus && matchesPriority && matchesCategory;
-  });
+  // IntersectionObserver for infinite scroll with my reusable hook
+  const loadMoreRef = useCallback(
+    (node) => {
+      if (observerRef.current) observerRef.current.disconnect();
+      observerRef.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore && !loadingMore) {
+          fetchTickets(pageNumber + 1, true);
+        }
+      });
+      if (node) observerRef.current.observe(node);
+    },
+    [hasMore, loadingMore, pageNumber, fetchTickets],
+  );
 
-  // Infinite scroll
-  const { displayCount, loadingMore, hasMore, loadMoreRef, resetDisplayCount } =
-    useInfiniteScroll({ itemsPerPage: 30, totalItems: filteredTickets.length });
+  // ticket filters
+  const displayedTickets = isAdmin
+    ? tickets
+    : tickets.filter((ticket) => {
+        const matchesSearch = ticket.subject
+          .toLowerCase()
+          .includes(debouncedSearch.toLowerCase());
+        const matchesStatus =
+          filterStatus === "all" || ticket.status === filterStatus;
+        const matchesPriority =
+          filterPriority === "all" || ticket.priority === filterPriority;
+        const matchesCategory =
+          filterCategory === "all" || ticket.category === filterCategory;
+        return matchesSearch && matchesStatus && matchesPriority && matchesCategory;
+      });
 
-  const displayedTickets = filteredTickets.slice(0, displayCount);
-
-  const handleFilterChange = (setter) => (e) => {
-    setter(e.target.value);
-    resetDisplayCount();
-  };
+  const handleFilterChange = (setter) => (e) => setter(e.target.value);
 
   // Navigation
   const handleAddNew = () => navigate("create");
@@ -150,14 +201,14 @@ const Tickets = () => {
         attachmentUrl: formData.attachment,
       });
       showSuccess("Ticket created successfully!");
-      await fetchTickets();
       navigate("/settings/tickets");
+      fetchTickets(1, false);
     } catch (err) {
       console.error("Failed to create ticket:", err);
     }
   };
 
-  // Admin action
+  // admin actions
   const handleAdminAction = async (ticketId, { message, attachment, newStatus, note }) => {
     try {
       await ticketService.addAction(ticketId, {
@@ -166,13 +217,13 @@ const Tickets = () => {
         newStatus: newStatus || null,
         note: note || null,
       });
-      await fetchTickets();
+      fetchTickets(1, false);
     } catch (err) {
       console.error("Failed to perform action:", err);
     }
   };
 
-  // Delete
+  // delete
   const handleDeleteClick = (ticket) => {
     setTicketToDelete(ticket);
     setIsDeleteDialogOpen(true);
@@ -182,7 +233,7 @@ const Tickets = () => {
     if (ticketToDelete) {
       try {
         await ticketService.delete(ticketToDelete.id);
-        await fetchTickets();
+        fetchTickets(1, false);
       } catch (err) {
         console.error("Failed to delete ticket:", err);
       }
@@ -190,7 +241,8 @@ const Tickets = () => {
     setIsDeleteDialogOpen(false);
     setTicketToDelete(null);
   };
-
+  // badges
+  const badgeCount = isAdmin ? totalItems : displayedTickets.length;
   const isChildActive = !!childRouteMatch;
 
   if (isChildActive) {
@@ -203,20 +255,20 @@ const Tickets = () => {
             onSave: handleSave,
             onAdminAction: handleAdminAction,
             onCancel: handleCancel,
-            onRefresh: fetchTickets,
+            onRefresh: () => fetchTickets(1, false),
           }}
         />
       </div>
     );
   }
-
+  // success message and button for new ticket
   return (
     <div className="tickets">
       {successMessage && <div className="success-toast">{successMessage}</div>}
       <div className="tickets__header">
         <div className="tickets__header-left">
           <h3 className="settings-section-title">Tickets Management</h3>
-          <span className="badge-count">{filteredTickets.length} tickets</span>
+          <span className="badge-count">{badgeCount} tickets</span>
         </div>
         <div className="tickets__header-right">
           {!isAdmin && (
@@ -229,7 +281,7 @@ const Tickets = () => {
           )}
         </div>
       </div>
-
+      {/* ticke dropdowns with my custom component */}
       <div className="tickets__filters">
         <input
           type="text"
@@ -254,21 +306,18 @@ const Tickets = () => {
           options={CATEGORY_FILTER_OPTIONS}
         />
       </div>
-
-      {loading ? (
-        <div className="tickets__loading">Loading tickets...</div>
-      ) : (
-        <TicketTableView
-          tickets={displayedTickets}
-          currentRole={currentRole}
-          onView={handleView}
-          onDelete={handleDeleteClick}
-          loadMoreRef={loadMoreRef}
-          hasMore={hasMore}
-          loadingMore={loadingMore}
-        />
-      )}
-
+        {/* ticke table view */}
+      <TicketTableView
+        tickets={displayedTickets}
+        currentRole={currentRole}
+        loading={loading}
+        onView={handleView}
+        onDelete={handleDeleteClick}
+        loadMoreRef={loadMoreRef}
+        hasMore={hasMore}
+        loadingMore={loadingMore}
+      />
+      {/* delete modal */}
       <DeleteModal
         isOpen={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}

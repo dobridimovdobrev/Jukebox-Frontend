@@ -3,6 +3,7 @@
 .song-list {
   display: flex;
   justify-content: flex-start;
+  align-content: flex-start;
   flex-wrap: wrap;
   gap: 0.2rem;
   border: 5px solid $highlight;
@@ -53,15 +54,15 @@
 
   // songs box for number,title,duration
   &__box {
-    width: 100%;
     display: flex;
     flex: 0 0 calc(20% - 0.2rem);
     justify-content: space-between;
     align-items: center;
     background-color: $song;
     border: 1px solid $special;
-    padding: 0 2px;
+    padding: 2px 4px;
     cursor: pointer;
+    font-size: 0.72rem;
 
     &:hover {
       background-color: rgba($highlight, 0.5);
@@ -123,29 +124,8 @@
     animation: generating-pulse 1.5s ease-in-out infinite;
   }
 
-  // enter animation for songs being added during generation
+  // enter animation for songs playlist quiz generation
   &__box--entering {
     animation: song-enter 0.4s ease-out;
-  }
-}
-
-@keyframes song-enter {
-  from {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes generating-pulse {
-  0%, 100% {
-    opacity: 0.6;
-  }
-  50% {
-    opacity: 1;
-    text-shadow: 0 0 8px rgba($primary, 0.5);
   }
 }

@@ -13,13 +13,14 @@ const DIFFICULTY_OPTIONS = [
   { value: "Medium", label: "Medium" },
   { value: "Hard", label: "Hard" },
 ];
-
+// in future i will add more categories
 const CATEGORY_FILTER_OPTIONS = [
   { value: "all", label: "All Categories" },
   { value: "Music", label: "Music" },
   { value: "General", label: "General" },
 ];
 
+// 30 questions after that i use my hook for infinite scroll and lazy loading
 const PAGE_SIZE = 30;
 
 const decodeHTMLEntities = (text) => {
@@ -27,12 +28,14 @@ const decodeHTMLEntities = (text) => {
   textarea.innerHTML = text;
   return textarea.value;
 };
+  /*  this is my quiz game for increment coins, 
+   but i configure it also to import questions from open source api for music category */
 
 const Quiz = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const formRouteMatch = useMatch("/settings/quiz/:action/*");
-
+// states
   const [successMessage, showSuccess] = useSuccessMessage();
 
   const [quizzes, setQuizzes] = useState([]);
@@ -103,7 +106,7 @@ const Quiz = () => {
     setter(e.target.value);
   };
 
-  // import from Open Trivia DB → save to backend
+  // import from Open Trivia DB and save to the db there are more than 2000 questions that i will import
   const fetchFromAPI = async (amount = 10) => {
     setImporting(true);
     setError(null);
@@ -137,7 +140,7 @@ const Quiz = () => {
       setImporting(false);
     }
   };
-
+  // i can create question for my quiz game manually too
   const handleAddNew = () => navigate("create");
   const handleEdit = (quiz) => navigate(`update/${quiz.quizId}`);
 
@@ -158,12 +161,12 @@ const Quiz = () => {
   };
 
   const handleCancelForm = () => navigate("/settings/quiz");
-
+  // delete on click
   const handleDeleteClick = (quiz) => {
     setQuizToDelete(quiz);
     setIsDeleteDialogOpen(true);
   };
-
+    // delete confirmation
   const handleDeleteConfirm = async () => {
     if (quizToDelete) {
       try {
@@ -240,7 +243,7 @@ const Quiz = () => {
           <Outlet key={location.pathname} context={{ quizzes, onSave: handleSave, onCancel: handleCancelForm }} />
         </div>
       </div>
-
+      {/* delete modal */}
       <DeleteModal
         isOpen={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}

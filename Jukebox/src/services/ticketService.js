@@ -1,7 +1,7 @@
 import api from "./api";
 
 const ticketService = {
-  // superamin search all tickets
+  // superadmin search all tickets
   search: async (params = {}) => {
     const response = await api.get("/ticket", { params });
     return response.data;
@@ -24,13 +24,19 @@ const ticketService = {
     return response.data;
   },
 
-  // superamin response + status change
+  // superadmin answer + status change
   addAction: async (id, request) => {
     const response = await api.post(`/ticket/${id}/action`, request);
     return response.data;
   },
 
-  // superamin get valid transitions
+  // user: reply to a ticket
+  reply: async (id, request) => {
+    const response = await api.post(`/ticket/${id}/reply`, request);
+    return response.data;
+  },
+
+  // superadmin valid transitions
   getTransitions: async (id) => {
     const response = await api.get(`/ticket/${id}/transitions`);
     return response.data;

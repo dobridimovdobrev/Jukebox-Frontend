@@ -16,19 +16,19 @@ const PlaylistWizard = ({ isActive, onClose }) => {
   const dispatch = useDispatch();
   const isPlaying = useSelector((s) => s.player.isPlaying);
 
-  // Wizard flow state
+  // wizzard steps state
   const [screen, setScreen] = useState("type");
   const [playlistType, setPlaylistType] = useState(null); // "individual" | "multiple"
   const [playlistName, setPlaylistName] = useState("");
   const [maxArtists, setMaxArtists] = useState(1);
   const [selectedArtists, setSelectedArtists] = useState([]);
 
-  // Artist search state
+  // artist search state
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
 
-  // Generation state
+  // generation playlist state
   const [progress, setProgress] = useState(0);
   const [generatedPlaylist, setGeneratedPlaylist] = useState(null);
   const [error, setError] = useState(null);
@@ -36,7 +36,7 @@ const PlaylistWizard = ({ isActive, onClose }) => {
   const animTimers = useRef([]);
   const searchTimer = useRef(null);
 
-  // Reset all state when wizard opens
+  // reset all state when wizzard start
   useEffect(() => {
     if (isActive) {
       setScreen("type");
@@ -57,7 +57,7 @@ const PlaylistWizard = ({ isActive, onClose }) => {
     };
   }, [isActive]);
 
-  // --- Artist search (debounced) ---
+  // artist search from api brainz music that i configure in backend
   const handleSearchChange = (value) => {
     setSearchQuery(value);
     if (searchTimer.current) clearTimeout(searchTimer.current);
@@ -72,7 +72,7 @@ const PlaylistWizard = ({ isActive, onClose }) => {
       try {
         const data = await artistService.searchMusicBrainz(value.trim());
         const items = Array.isArray(data) ? data : data.items || [];
-        // Exclude artists already selected
+        // exclude artists already selected
         const filtered = items.filter(
           (a) => !selectedArtists.some((s) => s.artistId === a.artistId)
         );
@@ -111,18 +111,18 @@ const PlaylistWizard = ({ isActive, onClose }) => {
     setSelectedArtists((prev) => prev.filter((a) => a.artistId !== artistId));
   };
 
-  // Auto-generate description from selected artist names
+  // auto description from selected artist names that user is slelected
   const buildDescription = () =>
     selectedArtists.map((a) => a.name).join(", ");
 
-  // Auto-generate category from artist genres
+  // auto category from artist genres
   const buildCategory = () => {
     const genres = selectedArtists.map((a) => a.genre).filter(Boolean);
     const unique = [...new Set(genres)];
     return unique.join(", ").slice(0, 50) || null;
   };
 
-  // --- Generation ---
+  // playlist generation
   const handleGenerate = async () => {
     setScreen("generating");
     setProgress(0);
@@ -132,9 +132,13 @@ const PlaylistWizard = ({ isActive, onClose }) => {
     dispatch(setSongs([]));
     dispatch(setGenerating(true));
 
-    // Fake progress 0→80% while API works
+    // fake progress for now to 99% over ~20s in future i wil sync with bakcend playlist generation
     const fakeInterval = setInterval(() => {
-      setProgress((prev) => (prev >= 80 ? prev : prev + Math.random() * 8));
+      setProgress((prev) => {
+        if (prev >= 99) return 99;
+        const remaining = 99 - prev;
+        return prev + remaining * 0.08;
+      });
     }, 300);
 
     try {
@@ -148,13 +152,12 @@ const PlaylistWizard = ({ isActive, onClose }) => {
       const result = await playlistService.generate(request);
 
       clearInterval(fakeInterval);
-      setProgress(85);
       setGeneratedPlaylist(result);
 
       dispatch(addPlaylist(result));
       dispatch(setActivePlaylist(result.playlistId));
 
-      // Spread before sort to avoid mutating frozen array
+      // spread before sort 
       const songs = [...(result.songs || [])].sort((a, b) => a.order - b.order);
       const totalSongs = songs.length;
 
@@ -165,7 +168,7 @@ const PlaylistWizard = ({ isActive, onClose }) => {
         return;
       }
 
-      // Dispatch songs in batches for animated population
+      // dispatch songs for populatre songlist with animation
       const batchSize = 3;
       const batches = [];
       for (let i = 0; i < totalSongs; i += batchSize) {
@@ -175,11 +178,12 @@ const PlaylistWizard = ({ isActive, onClose }) => {
       batches.forEach((batch, batchIndex) => {
         const timer = setTimeout(() => {
           dispatch(appendSongs(batch));
-          const done = Math.min((batchIndex + 1) * batchSize, totalSongs);
-          setProgress(85 + (done / totalSongs) * 15);
+          const fraction = Math.min((batchIndex + 1) * batchSize, totalSongs) / totalSongs;
+          setProgress((prev) => prev + (100 - prev) * fraction);
 
           if (batchIndex === batches.length - 1) {
             dispatch(setGenerating(false));
+            setProgress(100);
             setScreen("done");
           }
         }, batchIndex * 120);
@@ -202,9 +206,10 @@ const PlaylistWizard = ({ isActive, onClose }) => {
     onClose();
   };
 
-  // ===================== SCREENS =====================
+  //Screens for Quiz Playlist
 
-  // Screen 1 — Choose individual or multiple
+  // Screen 1 —  individual or multiple artists
+
   const renderType = () => (
     <div className="playlist-wizard__screen">
       <h3 className="playlist-wizard__title">Create Playlist</h3>
@@ -239,7 +244,7 @@ const PlaylistWizard = ({ isActive, onClose }) => {
     </div>
   );
 
-  // Screen 2 — Playlist name
+  // Screen 2 — playlist name
   const renderName = () => (
     <div className="playlist-wizard__screen">
       <button
@@ -275,7 +280,7 @@ const PlaylistWizard = ({ isActive, onClose }) => {
     </div>
   );
 
-  // Screen 3 — How many artists? (multiple only)
+  // Screen 3 — how many artists for multiple choise, max 5 artists are permitted
   const renderCount = () => (
     <div className="playlist-wizard__screen">
       <button
@@ -304,7 +309,7 @@ const PlaylistWizard = ({ isActive, onClose }) => {
     </div>
   );
 
-  // Screen 4 — Search & select artists one by one
+  // Screen 4 — search and select one by one from brainz music api trough backend
   const renderArtistSelect = () => (
     <div className="playlist-wizard__screen">
       <button
@@ -323,70 +328,7 @@ const PlaylistWizard = ({ isActive, onClose }) => {
       </span>
       {error && <span className="playlist-wizard__error">{error}</span>}
 
-      {/* Search input — only visible while still selecting */}
-      {selectedArtists.length < maxArtists && (
-        <div className="playlist-wizard__search">
-          <div className="playlist-wizard__search-field">
-            <input
-              type="text"
-              className="playlist-wizard__input"
-              value={searchQuery}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              placeholder="Search artist name..."
-              autoFocus
-            />
-            {searchLoading && (
-              <span className="playlist-wizard__search-spinner" />
-            )}
-          </div>
-
-          {/* Dropdown results */}
-          {searchResults.length > 0 && (
-            <div className="playlist-wizard__search-dropdown">
-              {searchResults.map((artist) => (
-                <div
-                  key={artist.artistId}
-                  className="playlist-wizard__search-item"
-                  onClick={() => handleSelectArtist(artist)}
-                >
-                  <img
-                    className="playlist-wizard__search-photo"
-                    src={artist.photo}
-                    alt={artist.name}
-                    onError={(e) => {
-                      e.target.src =
-                        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Crect fill='%23333' width='32' height='32'/%3E%3Ctext fill='%23C5A676' x='50%25' y='55%25' text-anchor='middle' font-size='10'%3E%3F%3C/text%3E%3C/svg%3E";
-                    }}
-                  />
-                  <div className="playlist-wizard__search-info">
-                    <span className="playlist-wizard__search-name">
-                      {artist.name}
-                    </span>
-                    {artist.genre && (
-                      <span className="playlist-wizard__search-genre">
-                        {artist.genre}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* No results message */}
-          {searchQuery.trim().length >= 2 &&
-            !searchLoading &&
-            searchResults.length === 0 && (
-              <div className="playlist-wizard__search-dropdown">
-                <span className="playlist-wizard__search-empty">
-                  No artists found
-                </span>
-              </div>
-            )}
-        </div>
-      )}
-
-      {/* Selected artists chips */}
+      {/* select artists — trough the search form */}
       {selectedArtists.length > 0 && (
         <div className="playlist-wizard__selected-list">
           {selectedArtists.map((artist) => (
@@ -417,6 +359,69 @@ const PlaylistWizard = ({ isActive, onClose }) => {
         </div>
       )}
 
+      {/* search only visible while still selecting */}
+      {selectedArtists.length < maxArtists && (
+        <div className="playlist-wizard__search">
+          <div className="playlist-wizard__search-field">
+            <input
+              type="text"
+              className="playlist-wizard__input"
+              value={searchQuery}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              placeholder="Search artist name..."
+              autoFocus
+            />
+            {searchLoading && (
+              <span className="playlist-wizard__search-spinner" />
+            )}
+          </div>
+
+          {/*dropdown select in search*/}
+          {searchResults.length > 0 && (
+            <div className="playlist-wizard__search-dropdown">
+              {searchResults.map((artist) => (
+                <div
+                  key={artist.musicBrainzId || artist.artistId}
+                  className="playlist-wizard__search-item"
+                  onClick={() => handleSelectArtist(artist)}
+                >
+                  <img
+                    className="playlist-wizard__search-photo"
+                    src={artist.photo}
+                    /* alt={artist.name} */
+                    onError={(e) => {
+                      e.target.src =
+                        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Crect fill='%23333' width='32' height='32'/%3E%3Ctext fill='%23C5A676' x='50%25' y='55%25' text-anchor='middle' font-size='10'%3E%3F%3C/text%3E%3C/svg%3E";
+                    }}
+                  />
+                  <div className="playlist-wizard__search-info">
+                    <span className="playlist-wizard__search-name">
+                      {artist.name}
+                    </span>
+                    {artist.genre && (
+                      <span className="playlist-wizard__search-genre">
+                        {artist.genre}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* no results message */}
+          {searchQuery.trim().length >= 2 &&
+            !searchLoading &&
+            searchResults.length === 0 && (
+              <div className="playlist-wizard__search-dropdown">
+                <span className="playlist-wizard__search-empty">
+                  No artists found
+                </span>
+              </div>
+            )}
+        </div>
+      )}
+
       <div className="playlist-wizard__actions playlist-wizard__actions--bottom-right">
         <button
           className="playlist-wizard__btn playlist-wizard__btn--proceed"
@@ -429,7 +434,7 @@ const PlaylistWizard = ({ isActive, onClose }) => {
     </div>
   );
 
-  // Screen 5 — Generating
+  // Screen 5 — genereate automatic playlist 
   const renderGenerating = () => (
     <div className="playlist-wizard__screen">
       <h3 className="playlist-wizard__title">Generating Playlist...</h3>
@@ -449,7 +454,7 @@ const PlaylistWizard = ({ isActive, onClose }) => {
     </div>
   );
 
-  // Screen 6 — Done
+  // Screen 6 — complete
   const renderDone = () => (
     <div className="playlist-wizard__screen">
       <h3 className="playlist-wizard__title">Playlist Created!</h3>

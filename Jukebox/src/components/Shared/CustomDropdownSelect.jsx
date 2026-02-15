@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import "./CustomDropdownSelect.scss";
 
+// i create ans style this dropdwon select for all forms where needed beacuse i don't like how browsers styling it
 const MAX_VISIBLE = 50;
 
 const CustomDropdownSelect = ({
@@ -16,10 +17,10 @@ const CustomDropdownSelect = ({
   const selectRef = useRef(null);
   const searchInputRef = useRef(null);
 
-  // Trova l'opzione selezionata
+  // find selected options
   const selectedOption = options.find(opt => opt.value === value);
 
-  // Filter options when searchable
+  // filter options with search input
   const filteredOptions = searchable && searchTerm
     ? options.filter(opt =>
         opt.label.toLowerCase().includes(searchTerm.toLowerCase())
@@ -29,7 +30,7 @@ const CustomDropdownSelect = ({
   const visibleOptions = filteredOptions.slice(0, MAX_VISIBLE);
   const hasMore = filteredOptions.length > MAX_VISIBLE;
 
-  // Chiudi dropdown quando si clicca fuori
+  // close dropdwon on click outside 
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (selectRef.current && !selectRef.current.contains(e.target)) {
@@ -41,7 +42,7 @@ const CustomDropdownSelect = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Chiudi con ESC
+  // close on press esc button
   useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === "Escape") setIsOpen(false);
@@ -53,14 +54,14 @@ const CustomDropdownSelect = ({
     }
   }, [isOpen]);
 
-  // Auto-focus search input when dropdown opens
+  // auto focus on search input
   useEffect(() => {
     if (isOpen && searchable && searchInputRef.current) {
       searchInputRef.current.focus();
     }
   }, [isOpen, searchable]);
 
-  // Reset search when closing
+  // reset search on close
   const handleClose = useCallback(() => {
     setIsOpen(false);
     setSearchTerm("");
@@ -75,7 +76,7 @@ const CustomDropdownSelect = ({
   };
 
   const handleSelect = (optionValue) => {
-    onChange({ target: { value: optionValue } }); // Simula evento nativo
+    onChange({ target: { value: optionValue } }); 
     handleClose();
   };
 
@@ -94,7 +95,7 @@ const CustomDropdownSelect = ({
         <span className="custom-select__value">
           {selectedOption ? selectedOption.label : placeholder}
         </span>
-        <span className="custom-select__arrow">▴</span>
+        <span className="custom-select__arrow">▾</span>
       </button>
 
       {isOpen && (

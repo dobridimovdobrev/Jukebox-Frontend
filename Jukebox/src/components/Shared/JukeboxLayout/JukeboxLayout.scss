@@ -85,7 +85,7 @@
     pointer-events: auto;
   }
 }
-// shake animations
+// shake animations need refactoring
 @keyframes shake-settings {
   0%, 100% {
     transform: rotateY(180deg) translateX(0);

@@ -4,8 +4,9 @@ import { playSong } from "@/redux/playerSlice";
 import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 import songService from "@/services/songService";
 
-const cleanTitle = (title) => title.replace(/["()'\/]/g, "").replace(/\s+/g, " ").trim();
+const cleanTitle = (title) => title.replace(/["()'/]/g, "").replace(/\s+/g, " ").trim();
 
+// format song duration
 const formatDuration = (seconds) => {
   if (!seconds) return "0:00";
   const m = Math.floor(seconds / 60);
@@ -22,25 +23,18 @@ const SongList = () => {
   const activeArtistId = useSelector((s) => s.player.activeArtistId);
   const activePlaylistId = useSelector((s) => s.player.activePlaylistId);
 
-  // Track which songs have been "revealed" for the enter animation
+  // enter songs animation in songlist front home
   const [revealedCount, setRevealedCount] = useState(0);
 
-  // When generating, track newly added songs for animation
+  // on generating track new added songs for animation
   useEffect(() => {
-    if (isGenerating) {
-      // Songs are being appended — update revealed count with a slight delay for animation
-      const timer = setTimeout(() => {
-        setRevealedCount(songs.length);
-      }, 50);
-      return () => clearTimeout(timer);
-    } else {
-      // Not generating — all songs are immediately revealed
-      setRevealedCount(songs.length);
-    }
+    const timer = setTimeout(() => setRevealedCount(songs.length), isGenerating ? 50 : 0);
+    return () => clearTimeout(timer);
   }, [songs.length, isGenerating]);
 
+  // 30 items per page infinite scroll with lazy loading using my hook
   const { displayCount, loadMoreRef, hasMore } = useInfiniteScroll({
-    itemsPerPage: 20,
+    itemsPerPage: 30,
     totalItems: songs.length,
   });
 

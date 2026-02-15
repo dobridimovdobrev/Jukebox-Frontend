@@ -23,7 +23,11 @@ const PlaylistsTableView = ({
   loadMoreRef,
   hasMore,
   loadingMore,
+  loading,
+  isAdmin,
 }) => {
+  const colCount = isAdmin ? 7 : 6;
+
   return (
     <div className="table-container">
       <table className="table settings-table">
@@ -33,23 +37,29 @@ const PlaylistsTableView = ({
             <th style={{ width: "25%" }}>Name</th>
             <th style={{ width: "30%" }}>Artists</th>
             <th>Songs</th>
-            <th>User</th>
+            {isAdmin && <th>User</th>}
             <th>Date</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {playlists.length === 0 ? (
+          {loading ? (
             <tr>
-              <td colSpan="7" className="text-center">
-                No playlists found. Create one!
+              <td colSpan={colCount} className="text-center">
+                Loading...
+              </td>
+            </tr>
+          ) : playlists.length === 0 ? (
+            <tr>
+              <td colSpan={colCount} className="text-center">
+                No playlists found.
               </td>
             </tr>
           ) : (
             <>
               {playlists.map((playlist, index) => (
                 <tr
-                  key={playlist.id}
+                  key={playlist.playlistId ?? `pl-${index}`}
                   ref={index === playlists.length - 1 ? loadMoreRef : null}
                 >
                   <td className="col-number">{index + 1}</td>
@@ -58,19 +68,21 @@ const PlaylistsTableView = ({
                     {formatArtists(playlist.artists)}
                   </td>
                   <td>{playlist.songsCount}</td>
-                  <td className="playlist-user-cell">{playlist.userName}</td>
+                  {isAdmin && <td className="playlist-user-cell">{playlist.userName}</td>}
                   <td className="playlist-date-cell">
                     {formatDate(playlist.createdAt)}
                   </td>
                   <td>
                     <div className="table-actions">
-                      <button
-                        className="btn-icon"
-                        onClick={() => onEdit(playlist)}
-                        title="Edit"
-                      >
-                        ✏️
-                      </button>
+                      {isAdmin && (
+                        <button
+                          className="btn-icon"
+                          onClick={() => onEdit(playlist)}
+                          title="Edit"
+                        >
+                          ✏️
+                        </button>
+                      )}
                       <button
                         className="btn-icon btn-icon--danger"
                         onClick={() => onDelete(playlist)}
@@ -84,7 +96,7 @@ const PlaylistsTableView = ({
               ))}
               {loadingMore && hasMore && (
                 <tr>
-                  <td colSpan="7" className="text-center loading-more">
+                  <td colSpan={colCount} className="text-center loading-more">
                     Loading...
                   </td>
                 </tr>

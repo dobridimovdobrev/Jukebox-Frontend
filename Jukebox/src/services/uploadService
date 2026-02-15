@@ -1,0 +1,44 @@
+import api, { API_HOST } from "./api";
+
+/*
+  Convert a base64 data URL to a Blob.
+ */
+const dataUrlToBlob = (dataUrl) => {
+  const [header, data] = dataUrl.split(",");
+  const mime = header.match(/:(.*?);/)[1];
+  const binary = atob(data);
+  const array = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    array[i] = binary.charCodeAt(i);
+  }
+  return new Blob([array], { type: mime });
+};
+
+const uploadService = {
+  /*
+    Upload a compressed base64 image to the server.
+    Returns the relative path uploads/tickets/abc.jpg
+   */
+  uploadImage: async (dataUrl) => {
+    const blob = dataUrlToBlob(dataUrl);
+    const formData = new FormData();
+    formData.append("file", blob, `ticket-${Date.now()}.jpg`);
+    const response = await api.post("/upload", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return response.data.url;
+  },
+
+  /*
+   Resolve an attachment URL for display.
+   base64 data URLs 
+   relative paths 
+   */
+  resolveUrl: (url) => {
+    if (!url) return null;
+    if (url.startsWith("data:")) return url;
+    return `${API_HOST}${url}`;
+  },
+};
+
+export default uploadService;

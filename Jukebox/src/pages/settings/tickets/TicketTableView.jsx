@@ -19,6 +19,7 @@ const formatDate = (dateStr) => {
 const TicketTableView = ({
   tickets,
   currentRole,
+  loading,
   onView,
   onDelete,
   loadMoreRef,
@@ -44,7 +45,13 @@ const TicketTableView = ({
           </tr>
         </thead>
         <tbody>
-          {tickets.length === 0 ? (
+          {loading ? (
+            <tr>
+              <td colSpan={colSpan} className="text-center loading-more">
+                Loading...
+              </td>
+            </tr>
+          ) : tickets.length === 0 ? (
             <tr>
               <td colSpan={colSpan} className="text-center">
                 No tickets found.
@@ -54,7 +61,7 @@ const TicketTableView = ({
             <>
               {tickets.map((ticket, index) => (
                 <tr
-                  key={ticket.id}
+                  key={ticket.id ?? `t-${index}`}
                   ref={index === tickets.length - 1 ? loadMoreRef : null}
                 >
                   <td className="col-number">{index + 1}</td>
@@ -78,38 +85,24 @@ const TicketTableView = ({
                   <td className="ticket-date-cell">
                     {formatDate(ticket.createdAt)}
                   </td>
-                  {isAdmin ? (
-                    <td>
-                      <div className="table-actions">
-                        <button
-                          className="btn-icon"
-                          onClick={() => onView(ticket)}
-                          title="View"
-                        >
-                          👁
-                        </button>
-                        <button
-                          className="btn-icon btn-icon--danger"
-                          onClick={() => onDelete(ticket)}
-                          title="Delete"
-                        >
-                          🗑️
-                        </button>
-                      </div>
-                    </td>
-                  ) : (
-                    <td>
-                      <div className="table-actions">
-                        <button
-                          className="btn-icon"
-                          onClick={() => onView(ticket)}
-                          title="View"
-                        >
-                          👁
-                        </button>
-                      </div>
-                    </td>
-                  )}
+                  <td>
+                    <div className="table-actions">
+                      <button
+                        className="btn-icon"
+                        onClick={() => onView(ticket)}
+                        title="View"
+                      >
+                        👁
+                      </button>
+                      <button
+                        className="btn-icon btn-icon--danger"
+                        onClick={() => onDelete(ticket)}
+                        title="Delete"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
               {loadingMore && hasMore && (

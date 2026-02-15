@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useSelector } from "react-redux";
 import { Outlet, useNavigate, useMatch, useLocation } from "react-router-dom";
 import "@/pages/settings/artists/Artists.scss";
 import ArtistTableView from "@/pages/settings/artists/ArtistTableView";
@@ -25,10 +26,14 @@ const GENRE_FILTER_OPTIONS = [
   { value: "Alternative", label: "Alternative" },
 ];
 
+const ADMIN_ROLES = ["SuperAdmin"];
+
 const Artists = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const formRouteMatch = useMatch("/settings/artists/:action/*");
+  const { user } = useSelector((state) => state.auth);
+  const isAdmin = user?.roles?.some((r) => ADMIN_ROLES.includes(r));
 
   const [successMessage, showSuccess] = useSuccessMessage();
 
@@ -243,6 +248,11 @@ const Artists = () => {
 
   const isFormActive = !!formRouteMatch;
 
+  // Block direct URL access to form routes for non-admin users
+  useEffect(() => {
+    if (isFormActive && !isAdmin) navigate("/settings/artists", { replace: true });
+  }, [isFormActive, isAdmin, navigate]);
+
   return (
     <div className="artists">
       {successMessage && <div className="success-toast">{successMessage}</div>}
@@ -253,93 +263,57 @@ const Artists = () => {
               <h3 className="settings-section-title">Artists Management</h3>
               <span className="badge-count">{totalItems} artists</span>
             </div>
-            <div className="artists__header-right">
-              <button
-                className="btn-action btn-action--secondary"
-                onClick={() => {
-                  setShowImport(!showImport);
-                  setImportQuery("");
-                  setImportResults([]);
-                  setImportError("");
-                  setImportSuccess("");
-                }}
-              >
-                ↓ Import
-              </button>
-              <button className="btn-action btn-action--primary" onClick={handleAddNew}>
-                + Add Artist
-              </button>
-            </div>
+            {isAdmin && (
+              <div className="artists__header-right">
+                <button
+                  className="btn-action btn-action--secondary"
+                  onClick={() => {
+                    setShowImport(!showImport);
+                    setImportQuery("");
+                    setImportResults([]);
+                    setImportError("");
+                    setImportSuccess("");
+                  }}
+                >
+                  ↓ Import
+                </button>
+                <button className="btn-action btn-action--primary" onClick={handleAddNew}>
+                  + Add Artist
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* import bar with real-time search */}
-          {showImport && (
+          {isAdmin && showImport && (
             <div className="artists__import">
               <div className="artists__import-search">
                 <input
                   type="text"
                   className="form-control settings-search"
-                  placeholder="Search artist to import (e.g. Eminem, Snoop Dogg)..."
+                  placeholder="Search MusicBrainz..."
                   value={importQuery}
                   onChange={(e) => handleImportSearchChange(e.target.value)}
-                  disabled={importing}
-                  autoFocus
                 />
-                {(importSearching || importing) && (
-                  <span className="artists__import-spinner">
-                    {importing ? "Importing..." : "Searching..."}
-                  </span>
-                )}
+                {importSearching && <span className="artists__import-spinner" />}
               </div>
-
-              {/* dropdown results */}
-              {importResults.length > 0 && !importing && (
-                <div className="artists__import-dropdown">
-                  {importResults.map((result) => (
+              {importResults.length > 0 && (
+                <div className="artists__import-results">
+                  {importResults.map((r) => (
                     <div
-                      key={result.musicBrainzId}
-                      className={`artists__import-item${result.artistId ? " artists__import-item--exists" : ""}`}
-                      onClick={() => handleImportSelect(result)}
+                      key={r.musicBrainzId || r.artistId}
+                      className="artists__import-item"
+                      onClick={() => handleImportSelect(r)}
                     >
-                      {result.photo && result.photo !== "default.jpg" && (
-                        <img
-                          className="artists__import-photo"
-                          src={result.photo}
-                          alt={result.name}
-                          onError={(e) => {
-                            e.target.style.display = "none";
-                          }}
-                        />
-                      )}
-                      <div className="artists__import-info">
-                        <span className="artists__import-name">{result.name}</span>
-                        <span className="artists__import-meta">
-                          {result.genre && <span>{result.genre}</span>}
-                          {result.countryCode && <span> · {result.countryCode}</span>}
-                          {result.artistId && <span className="artists__import-badge">Already in DB</span>}
-                        </span>
-                      </div>
+                      <span>{r.name}</span>
+                      {r.genre && <span className="artists__import-genre">{r.genre}</span>}
+                      {r.artistId && <span className="artists__import-badge">In DB</span>}
                     </div>
                   ))}
                 </div>
               )}
-
-              {/* no results */}
-              {importQuery.trim().length >= 2 &&
-                !importSearching &&
-                !importing &&
-                importResults.length === 0 && (
-                  <div className="artists__import-dropdown">
-                    <span className="artists__import-empty">No artists found</span>
-                  </div>
-                )}
-
-              {importError && (
-                <span className="settings-form__error">{importError}</span>
-              )}
-              {importSuccess && (
-                <span className="artists__import-success">{importSuccess}</span>
-              )}
+              {importError && <span className="artists__import-error">{importError}</span>}
+              {importSuccess && <span className="artists__import-success">{importSuccess}</span>}
+              {importing && <span className="artists__import-loading">Importing...</span>}
             </div>
           )}
 
@@ -379,6 +353,7 @@ const Artists = () => {
             onLoadMore={handleLoadMore}
             hasMore={hasMore}
             loading={loading}
+            isAdmin={isAdmin}
           />
         </div>
         <div className="crud-layout__form">

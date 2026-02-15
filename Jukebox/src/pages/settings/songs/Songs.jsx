@@ -1,15 +1,15 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useSelector } from "react-redux";
 import { Outlet, useNavigate, useMatch, useLocation } from "react-router-dom";
 import "@/pages/settings/songs/Songs.scss";
 import SongTableView from "@/pages/settings/songs/SongTableView";
 import CustomDropdownSelect from "@/components/Shared/CustomDropdownSelect";
 import DeleteModal from "@/components/Shared/DeleteModal";
-import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 import songService from "@/services/songService";
 import artistService from "@/services/artistService";
 import countryService from "@/services/countryService";
 import useSuccessMessage from "@/hooks/useSuccessMessage";
-
+// i will improve this from back end in the future
 const GENRE_FILTER_OPTIONS = [
   { value: "all", label: "All Genres" },
   { value: "Pop", label: "Pop" },
@@ -21,7 +21,7 @@ const GENRE_FILTER_OPTIONS = [
   { value: "Reggae", label: "Reggae" },
   { value: "Alternative", label: "Alternative" },
 ];
-
+// i will improve this from back end in the future
 const DECADE_FILTER_OPTIONS = [
   { value: "all", label: "All Years" },
   { value: "1950", label: "1950–1959" },
@@ -34,20 +34,30 @@ const DECADE_FILTER_OPTIONS = [
   { value: "2020", label: "2020–2029" },
 ];
 
+const PAGE_SIZE = 30;
+
+const ADMIN_ROLES = ["SuperAdmin"];
+
 const Songs = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const formRouteMatch = useMatch("/settings/songs/:action/*");
+  const { user } = useSelector((state) => state.auth);
+  const isAdmin = user?.roles?.some((r) => ADMIN_ROLES.includes(r));
 
   const [successMessage, showSuccess] = useSuccessMessage();
 
-  // Data
+  // song data
   const [songs, setSongs] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const [totalItems, setTotalItems] = useState(0);
+  const [pageNumber, setPageNumber] = useState(1);
   const [artists, setArtists] = useState([]);
   const [countries, setCountries] = useState([]);
 
-  // Filters
+  // song filters
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [filterGenre, setFilterGenre] = useState("all");
@@ -55,11 +65,13 @@ const Songs = () => {
   const [filterDecade, setFilterDecade] = useState("all");
   const [filterCountry, setFilterCountry] = useState("all");
 
-  // Delete dialog
+  // delete modal
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [songToDelete, setSongToDelete] = useState(null);
 
-  // Debounce search term
+  const observerRef = useRef(null);
+
+  // search temr
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(searchTerm), 400);
     return () => clearTimeout(timer);
@@ -87,7 +99,7 @@ const Songs = () => {
     fetchCountries();
   }, []);
 
-  // Build dropdown options from fetched artists
+  // Build dropdown options
   const artistFilterOptions = [
     { value: "all", label: "All Artists" },
     ...artists.map((a) => ({ value: String(a.artistId), label: a.name })),
@@ -98,7 +110,7 @@ const Songs = () => {
     label: a.name,
   }));
 
-  // Build country filter options from fetched countries
+  // Build country filter 
   const countryFilterOptions = [
     { value: "all", label: "All Countries" },
     ...countries.map((c) => ({ value: c.countryCode || c.code, label: c.name || c.countryCode || c.code })),
@@ -109,56 +121,64 @@ const Songs = () => {
     label: c.name || c.countryCode || c.code,
   }));
 
-  // Fetch all songs from API (all filters server-side, handles pagination)
-  const fetchSongs = useCallback(async () => {
-    setLoading(true);
-    try {
-      const baseParams = { PageSize: 100 };
-      if (debouncedSearch) baseParams.Title = debouncedSearch;
-      if (filterGenre !== "all") baseParams.Genre = filterGenre;
-      if (filterArtist !== "all") baseParams.ArtistId = Number(filterArtist);
-      if (filterCountry !== "all") baseParams.CountryCode = filterCountry;
-      if (filterDecade !== "all") {
-        baseParams.ReleaseYearFrom = Number(filterDecade);
-        baseParams.ReleaseYearTo = Number(filterDecade) + 9;
+  // Fetch songs with backend pagination
+  const fetchSongs = useCallback(
+    async (page = 1, append = false) => {
+      try {
+        if (page === 1) setLoading(true);
+        else setLoadingMore(true);
+
+        const params = { PageNumber: page, PageSize: PAGE_SIZE };
+        if (debouncedSearch) params.Title = debouncedSearch;
+        if (filterGenre !== "all") params.Genre = filterGenre;
+        if (filterArtist !== "all") params.ArtistId = Number(filterArtist);
+        if (filterCountry !== "all") params.CountryCode = filterCountry;
+        if (filterDecade !== "all") {
+          params.ReleaseYearFrom = Number(filterDecade);
+          params.ReleaseYearTo = Number(filterDecade) + 9;
+        }
+
+        const data = await songService.search(params);
+
+        if (append) {
+          setSongs((prev) => [...prev, ...data.items]);
+        } else {
+          setSongs(data.items || []);
+        }
+        setTotalItems(data.totalItems);
+        setHasMore(data.hasNextPage);
+        setPageNumber(page);
+      } catch (err) {
+        console.error("Failed to fetch songs:", err);
+      } finally {
+        setLoading(false);
+        setLoadingMore(false);
       }
-
-      // Fetch first page
-      const firstPage = await songService.search({ ...baseParams, PageNumber: 1 });
-      let allSongs = firstPage.items || [];
-      const total = firstPage.totalItems || allSongs.length;
-
-      // Fetch remaining pages if needed
-      const totalPages = Math.ceil(total / 100);
-      for (let page = 2; page <= totalPages; page++) {
-        const nextPage = await songService.search({ ...baseParams, PageNumber: page });
-        allSongs = [...allSongs, ...(nextPage.items || [])];
-      }
-
-      setSongs(allSongs);
-    } catch (err) {
-      console.error("Failed to fetch songs:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, [debouncedSearch, filterGenre, filterArtist, filterCountry, filterDecade]);
+    },
+    [debouncedSearch, filterGenre, filterArtist, filterCountry, filterDecade],
+  );
 
   useEffect(() => {
-    fetchSongs();
+    fetchSongs(1, false);
   }, [fetchSongs]);
 
-  // Infinite scroll for display
-  const { displayCount, loadingMore, hasMore, loadMoreRef, resetDisplayCount } =
-    useInfiniteScroll({ itemsPerPage: 30, totalItems: songs.length });
+  // IntersectionObserver for infinite scroll with lazy loading using my hook 
+  const loadMoreRef = useCallback(
+    (node) => {
+      if (observerRef.current) observerRef.current.disconnect();
+      observerRef.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore && !loadingMore) {
+          fetchSongs(pageNumber + 1, true);
+        }
+      });
+      if (node) observerRef.current.observe(node);
+    },
+    [hasMore, loadingMore, pageNumber, fetchSongs],
+  );
 
-  const displayedSongs = songs.slice(0, displayCount);
+  const handleFilterChange = (setter) => (e) => setter(e.target.value);
 
-  const handleFilterChange = (setter) => (e) => {
-    setter(e.target.value);
-    resetDisplayCount();
-  };
-
-  // CRUD
+  // CRUD operations  
   const handleAddNew = () => navigate("create");
 
   const handleEdit = (song) => navigate(`update/${song.songId}`);
@@ -172,8 +192,8 @@ const Songs = () => {
         await songService.create(songData);
         showSuccess("Song created successfully!");
       }
-      await fetchSongs();
       navigate("/settings/songs");
+      fetchSongs(1, false);
     } catch (err) {
       console.error("Failed to save song:", err);
     }
@@ -190,7 +210,7 @@ const Songs = () => {
     if (songToDelete) {
       try {
         await songService.delete(songToDelete.songId);
-        await fetchSongs();
+        fetchSongs(1, false);
       } catch (err) {
         console.error("Failed to delete song:", err);
       }
@@ -201,6 +221,12 @@ const Songs = () => {
 
   const isFormActive = !!formRouteMatch;
 
+  /* block direct url access for standard users i need to improve this
+  from my SiBackendless, i don't want to give access to all info of my songs to users for now */
+  useEffect(() => {
+    if (isFormActive && !isAdmin) navigate("/settings/songs", { replace: true });
+  }, [isFormActive, isAdmin, navigate]);
+
   return (
     <div className="songs">
       {successMessage && <div className="success-toast">{successMessage}</div>}
@@ -209,13 +235,15 @@ const Songs = () => {
           <div className="songs__header">
             <div className="songs__header-left">
               <h3 className="settings-section-title">Songs Management</h3>
-              <span className="badge-count">{songs.length} songs</span>
+              <span className="badge-count">{totalItems} songs</span>
             </div>
-            <div className="songs__header-right">
-              <button className="btn-action btn-action--primary" onClick={handleAddNew}>
-                + Add Song
-              </button>
-            </div>
+            {isAdmin && (
+              <div className="songs__header-right">
+                <button className="btn-action btn-action--primary" onClick={handleAddNew}>
+                  + Add Song
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="songs__filters">
@@ -251,17 +279,18 @@ const Songs = () => {
           </div>
         </>
       )}
-
+        {/* crud operations */}
       <div className={`crud-layout${isFormActive ? " crud-layout--form-active" : ""}`}>
         <div className="crud-layout__table">
           <SongTableView
-            songs={displayedSongs}
+            songs={songs}
             loading={loading}
             onEdit={handleEdit}
             onDelete={handleDeleteClick}
             loadMoreRef={loadMoreRef}
             hasMore={hasMore}
             loadingMore={loadingMore}
+            isAdmin={isAdmin}
           />
         </div>
         <div className="crud-layout__form">
@@ -274,7 +303,7 @@ const Songs = () => {
           />
         </div>
       </div>
-
+        {/* delete modal */}
       <DeleteModal
         isOpen={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}

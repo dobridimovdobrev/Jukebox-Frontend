@@ -13,6 +13,7 @@ const ArtistTableView = ({
   onLoadMore,
   hasMore,
   loading,
+  isAdmin,
 }) => {
   const loadMoreRef = useRef(null);
 
@@ -44,20 +45,20 @@ const ArtistTableView = ({
             <th>Played</th>
             <th>Career</th>
             <th>Country</th>
-            <th>Actions</th>
+            {isAdmin && <th>Actions</th>}
           </tr>
         </thead>
         <tbody>
           {artists.length === 0 ? (
             <tr>
-              <td colSpan="9" className="text-center">
+              <td colSpan={isAdmin ? 9 : 8} className="text-center">
                 {loading ? "Loading..." : "No artists found. Add one manually or import."}
               </td>
             </tr>
           ) : (
             <>
               {artists.map((artist, index) => (
-                <tr key={artist.artistId}>
+                <tr key={artist.artistId ?? `a-${index}`}>
                   <td className="col-number">{index + 1}</td>
                   <td>
                     {artist.photo && artist.photo !== "default.jpg" ? (
@@ -80,37 +81,27 @@ const ArtistTableView = ({
                     {formatCareer(artist.careerStart, artist.careerEnd)}
                   </td>
                   <td>{artist.countryCode || "—"}</td>
-                  <td>
-                    <div className="table-actions">
-                      <button
-                        className="btn-icon btn-icon--success"
-                        onClick={() => onToggleActive(artist.artistId)}
-                        title={artist.isActive ? "Deactivate" : "Activate"}
-                      >
-                        {artist.isActive ? "⏸" : "▶"}
-                      </button>
-                      <button
-                        className="btn-icon"
-                        onClick={() => onEdit(artist)}
-                        title="Edit"
-                      >
-                        ✏️
-                      </button>
-                      <button
-                        className="btn-icon btn-icon--danger"
-                        onClick={() => onDelete(artist)}
-                        title="Delete"
-                      >
-                        🗑️
-                      </button>
-                    </div>
-                  </td>
+                  {isAdmin && (
+                    <td>
+                      <div className="table-actions">
+                        <button className="btn-icon" onClick={() => onEdit(artist)} title="Edit">✏️</button>
+                        <button className="btn-icon btn-icon--danger" onClick={() => onDelete(artist)} title="Delete">🗑️</button>
+                        <button
+                          className={`btn-icon ${artist.isActive ? "btn-icon--success" : "btn-icon--muted"}`}
+                          onClick={() => onToggleActive(artist.artistId)}
+                          title={artist.isActive ? "Active" : "Inactive"}
+                        >
+                          {artist.isActive ? "✅" : "⛔"}
+                        </button>
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))}
               {/* infinite scroll  */}
               {hasMore && (
                 <tr ref={loadMoreRef}>
-                  <td colSpan="9" className="text-center loading-more">
+                  <td colSpan={isAdmin ? 9 : 8} className="text-center loading-more">
                     {loading ? "Loading..." : ""}
                   </td>
                 </tr>

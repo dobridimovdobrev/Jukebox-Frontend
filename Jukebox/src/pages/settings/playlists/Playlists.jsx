@@ -1,16 +1,21 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useSelector } from "react-redux";
 import { Outlet, useNavigate, useMatch } from "react-router-dom";
 import "@/pages/settings/playlists/Playlists.scss";
 import PlaylistsTableView from "@/pages/settings/playlists/PlaylistsTableView";
 import DeleteModal from "@/components/Shared/DeleteModal";
 import playlistService from "@/services/playlistService";
+import artistService from "@/services/artistService";
 import useSuccessMessage from "@/hooks/useSuccessMessage";
 
 const PAGE_SIZE = 30;
+const ADMIN_ROLES = ["SuperAdmin"];
 
 const Playlists = () => {
   const navigate = useNavigate();
   const formRouteMatch = useMatch("/settings/playlists/:action/*");
+  const { user } = useSelector((state) => state.auth);
+  const isAdmin = user?.roles?.some((r) => ADMIN_ROLES.includes(r));
 
   const [successMessage, showSuccess] = useSuccessMessage();
 
@@ -22,41 +27,72 @@ const Playlists = () => {
   const [pageNumber, setPageNumber] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
 
+  const [artists, setArtists] = useState([]);
+
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [playlistToDelete, setPlaylistToDelete] = useState(null);
 
   const observerRef = useRef(null);
 
+  // playlist search from backend
   const fetchPlaylists = useCallback(async (page = 1, append = false) => {
     try {
       if (page === 1) setLoading(true);
       else setLoadingMore(true);
 
-      const params = { pageNumber: page, pageSize: PAGE_SIZE };
-      if (searchTerm) params.name = searchTerm;
+      if (isAdmin) {
+        const params = { pageNumber: page, pageSize: PAGE_SIZE };
+        if (searchTerm) params.name = searchTerm;
 
-      const data = await playlistService.search(params);
+        const data = await playlistService.search(params);
 
-      if (append) {
-        setPlaylists((prev) => [...prev, ...data.items]);
+        if (append) {
+          setPlaylists((prev) => [...prev, ...data.items]);
+        } else {
+          setPlaylists(data.items || []);
+        }
+        setTotalItems(data.totalItems);
+        setHasMore(data.hasNextPage);
+        setPageNumber(page);
       } else {
-        setPlaylists(data.items || []);
+        const data = await playlistService.getMy();
+        setPlaylists(Array.isArray(data) ? data : data.items || []);
+        setHasMore(false);
+        setTotalItems(Array.isArray(data) ? data.length : (data.items || []).length);
       }
-      setTotalItems(data.totalItems);
-      setHasMore(data.hasNextPage);
-      setPageNumber(page);
     } catch (error) {
       console.error("Fetch playlists error:", error);
     } finally {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [searchTerm]);
+  }, [searchTerm, isAdmin]);
 
   useEffect(() => {
     fetchPlaylists(1, false);
   }, [fetchPlaylists]);
 
+  useEffect(() => {
+    if (!isAdmin) return;
+    const fetchArtists = async () => {
+      try {
+        const data = await artistService.search({ PageSize: 100 });
+        setArtists(data.items || []);
+      } catch (err) {
+        console.error("Failed to fetch artists:", err);
+      }
+    };
+    fetchArtists();
+  }, [isAdmin]);
+
+  const artistOptions = artists.map((a) => ({
+    value: a.artistId,
+    label: a.name,
+    careerStart: a.careerStart,
+    careerEnd: a.careerEnd,
+  }));
+
+  // infinite scroll
   const loadMoreRef = useCallback(
     (node) => {
       if (observerRef.current) observerRef.current.disconnect();
@@ -70,6 +106,13 @@ const Playlists = () => {
     [hasMore, loadingMore, pageNumber, fetchPlaylists]
   );
 
+  // searching playlist filters
+  const displayedPlaylists = !isAdmin && searchTerm
+    ? playlists.filter((p) =>
+        p.name?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : playlists;
+
   const handleAddNew = () => navigate("create");
   const handleEdit = (playlist) => navigate(`update/${playlist.playlistId}`);
 
@@ -79,9 +122,8 @@ const Playlists = () => {
         await playlistService.update(playlistId, playlistData);
         showSuccess("Playlist updated successfully!");
       } else {
-        // new playlist → generate (imports songs from APIs)
-        await playlistService.generate(playlistData);
-        showSuccess("Playlist generated successfully!");
+        await playlistService.create(playlistData);
+        showSuccess("Playlist created successfully!");
       }
       navigate("/settings/playlists");
       fetchPlaylists(1, false);
@@ -110,12 +152,17 @@ const Playlists = () => {
     setPlaylistToDelete(null);
   };
 
-  const isChildActive = !!formRouteMatch;
+  const isFormActive = !!formRouteMatch;
 
-  if (isChildActive) {
+  // block direct url for standard users
+  useEffect(() => {
+    if (isFormActive && !isAdmin) navigate("/settings/playlists", { replace: true });
+  }, [isFormActive, isAdmin, navigate]);
+
+  if (isFormActive && isAdmin) {
     return (
       <div className="playlists">
-        <Outlet context={{ playlists, onSave: handleSave, onCancel: handleCancelForm }} />
+        <Outlet context={{ playlists, artists: artistOptions, onSave: handleSave, onCancel: handleCancelForm }} />
       </div>
     );
   }
@@ -126,15 +173,19 @@ const Playlists = () => {
       <div className="playlists__header">
         <div className="playlists__header-left">
           <h3 className="settings-section-title">Playlists Management</h3>
-          <span className="badge-count">{totalItems} playlists</span>
+          <span className="badge-count">
+            {isAdmin ? totalItems : displayedPlaylists.length} playlists
+          </span>
         </div>
-        <div className="playlists__header-right">
-          <button className="btn-action btn-action--primary" onClick={handleAddNew}>
-            + Generate Playlist
-          </button>
-        </div>
+        {isAdmin && (
+          <div className="playlists__header-right">
+            <button className="btn-action btn-action--primary" onClick={handleAddNew}>
+              + Add Playlist
+            </button>
+          </div>
+        )}
       </div>
-
+        {/* playlist filters */}
       <div className="playlists__filters">
         <input
           type="text"
@@ -144,17 +195,18 @@ const Playlists = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
-
+        {/* playlist table view */}
       <PlaylistsTableView
-        playlists={playlists}
+        playlists={displayedPlaylists}
         onEdit={handleEdit}
         onDelete={handleDeleteClick}
         loadMoreRef={loadMoreRef}
         hasMore={hasMore}
         loadingMore={loadingMore}
         loading={loading}
+        isAdmin={isAdmin}
       />
-
+      {/* delete playlist modal */}
       <DeleteModal
         isOpen={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}

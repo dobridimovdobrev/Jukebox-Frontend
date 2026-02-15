@@ -26,6 +26,13 @@
     letter-spacing: 2px;
     flex-shrink: 0;
   }
+
+  &__role {
+    font-size: 0.75rem;
+    color: rgba($gold, 0.6);
+    font-weight: 400;
+    letter-spacing: 1px;
+  }
   // top navigation
   &__navigation {
     flex: 1;

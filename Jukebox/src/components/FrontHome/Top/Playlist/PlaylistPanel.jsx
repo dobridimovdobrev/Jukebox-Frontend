@@ -15,6 +15,7 @@ const PlaylistPanel = ({ isActive, onClose }) => {
 
   const visiblePlaylists = playlists.slice(0, displayCount);
 
+  // playlist for playlist generation quiz with button activate from controls
   const handlePlaylistClick = async (playlist) => {
     if (playlist.playlistId === activePlaylistId) return;
     try {
@@ -23,7 +24,7 @@ const PlaylistPanel = ({ isActive, onClose }) => {
       dispatch(setSongs(songs));
       dispatch(setActivePlaylist(playlist.playlistId));
 
-      // Auto-play first song (same pattern as Artist click)
+      // auto play first song
       if (songs.length > 0) {
         dispatch(playSong({ song: songs[0], index: 0 }));
       }
@@ -64,7 +65,7 @@ const PlaylistPanel = ({ isActive, onClose }) => {
               <tbody>
                 {visiblePlaylists.map((pl, i) => (
                   <tr
-                    key={pl.playlistId}
+                    key={pl.playlistId ?? `pl-${i}`}
                     className={
                       pl.playlistId === activePlaylistId
                         ? "playlist-panel__row--active"

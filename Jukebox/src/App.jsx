@@ -58,7 +58,6 @@ function App() {
             </Route>
 
             {/* Shared routes for superadmin and user */}
-            <Route path="profile" element={<Profile />} />
             <Route path="artists" element={<Artists />}>
               <Route path="create" element={<ArtistForm />} />
               <Route path="update/:id" element={<ArtistForm />} />
@@ -75,6 +74,7 @@ function App() {
               <Route path="create" element={<TicketCreateForm />} />
               <Route path="view/:id" element={<TicketDetail />} />
             </Route>
+            <Route path="profile" element={<Profile />} />
           </Route>
         </Route>
         </Route>

@@ -1,6 +1,6 @@
 @use "@/styles/abstracts/variables" as *;
 
-// 3x blink animation for correct answer highlight
+// 3 times blink animation for correct answer
 @keyframes quiz-blink-correct {
   0%,
   100% {
@@ -38,7 +38,7 @@
     pointer-events: auto;
   }
 
-  // inner content container (dark overlay over background image)
+  // dark overlay with bg image
   &__content {
     width: 100%;
     height: 100%;
@@ -49,7 +49,7 @@
     background: rgba(#0a0908, 0.8);
   }
 
-  // close button (top-right, all screens)
+  // close button  top right
   &__close {
     position: absolute;
     top: 0.4rem;
@@ -69,7 +69,7 @@
     }
   }
 
-  // generic screen wrapper
+  // generic screen 
   &__screen {
     width: 100%;
     height: 100%;
@@ -90,7 +90,7 @@
     margin: 0;
   }
 
-  // --- BACK LINK (arrow, top-left) ---
+  // back link top left
   &__back-link {
     position: absolute;
     top: 0;
@@ -165,7 +165,7 @@
     height: 14px;
   }
 
-  // --- BUTTONS ---
+  // buttons
   &__btn {
     background: rgba(0, 0, 0, 0.5);
     border: 1px solid $primary;
@@ -199,21 +199,21 @@
     }
   }
 
-  // --- HINT TEXT (below options) ---
+  // hint text
   &__hint-text {
     color: rgba($gold, 0.6);
     font-size: 0.8rem;
     margin-top: 0.2rem;
   }
 
-  // --- ERROR TEXT ---
+  // error text
   &__error-text {
     color: #dc3545;
     font-size: 0.8rem;
     text-align: center;
   }
 
-  // --- DIFFICULTY / CATEGORY OPTIONS ---
+  // difficulty categories
   &__options {
     display: flex;
     gap: 0.7rem;
@@ -271,7 +271,7 @@
     color: rgba($gold, 0.7);
   }
 
-  // --- QUESTION SCREEN ---
+  // quiz screen questions
   &__question-header {
     width: 100%;
     display: flex;
@@ -321,7 +321,7 @@
       cursor: default;
     }
 
-    // 3x green blink for correct answer
+    // 3times blink for correct answer
     &--blink {
       animation: quiz-blink-correct 0.4s ease-in-out 2;
       animation-fill-mode: forwards;
@@ -335,7 +335,7 @@
     }
   }
 
-  // --- RESULTS SCREEN ---
+  // result screen
   &__stats {
     display: flex;
     gap: 1.1rem;

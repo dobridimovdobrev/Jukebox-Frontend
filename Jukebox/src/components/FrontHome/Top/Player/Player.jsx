@@ -13,7 +13,7 @@ import VinylDisc from "@/assets/retro-vinyl-disc.webp";
 import VinylBackground from "@/assets/new-vinyl-background.webp";
 import Braccio from "@/assets/braccio.webp";
 
-// Singleton: load YouTube IFrame API script once
+// load youtub iframe
 let ytApiPromise = null;
 const loadYTApi = () => {
   if (ytApiPromise) return ytApiPromise;
@@ -28,6 +28,7 @@ const loadYTApi = () => {
   return ytApiPromise;
 };
 
+// player with redux gloabal
 const Player = forwardRef(({ isPlaying, showVideo }, ref) => {
   const ytPlayer = useRef(null);
   const playerContainerRef = useRef(null);
@@ -35,8 +36,6 @@ const Player = forwardRef(({ isPlaying, showVideo }, ref) => {
   const isPlayingRef = useRef(isPlaying);
   const dispatch = useDispatch();
 
-  // Keep isPlayingRef current so the YT useEffect can read it without re-triggering
-  isPlayingRef.current = isPlaying;
   const [ytReady, setYtReady] = useState(!!window.YT?.Player);
 
   const currentSong = useSelector((s) => s.player.currentSong);
@@ -44,15 +43,15 @@ const Player = forwardRef(({ isPlaying, showVideo }, ref) => {
   const songs = useSelector((s) => s.player.songs);
   const coins = useSelector((s) => s.player.coins);
 
-  // Keep stateRef current for closure in YT event handler
-  stateRef.current = { currentIndex, songs, coins };
+  useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
+  useEffect(() => { stateRef.current = { currentIndex, songs, coins }; }, [currentIndex, songs, coins]);
 
-  // Load YouTube API on mount
+  // load youtube api on mount component
   useEffect(() => {
     loadYTApi().then(() => setYtReady(true));
   }, []);
 
-  // Handle video state change (auto-next / stop at end of playlist)
+  // video state change i am using it like a central modal
   const handleStateChange = useCallback(
     (event) => {
       if (event.data === window.YT.PlayerState.ENDED) {
@@ -71,12 +70,12 @@ const Player = forwardRef(({ isPlaying, showVideo }, ref) => {
     [dispatch]
   );
 
-  // Create or update YouTube player when song changes
+  // create or update youtube player when song changes
   useEffect(() => {
     if (!ytReady || !currentSong?.youtubeId) return;
 
     if (ytPlayer.current) {
-      // Player already exists → load or cue based on play state
+      
       if (isPlayingRef.current) {
         ytPlayer.current.loadVideoById(currentSong.youtubeId);
       } else {
@@ -85,7 +84,7 @@ const Player = forwardRef(({ isPlaying, showVideo }, ref) => {
       return;
     }
 
-    // First time → create player inside container
+    // creatr first time player in the container
     if (!playerContainerRef.current) return;
     const div = document.createElement("div");
     playerContainerRef.current.innerHTML = "";
@@ -105,7 +104,7 @@ const Player = forwardRef(({ isPlaying, showVideo }, ref) => {
     });
   }, [ytReady, currentSong?.youtubeId, handleStateChange]);
 
-  // Cleanup on unmount
+  // clean on unmount
   useEffect(() => {
     return () => {
       if (ytPlayer.current?.destroy) {
@@ -115,7 +114,7 @@ const Player = forwardRef(({ isPlaying, showVideo }, ref) => {
     };
   }, []);
 
-  // Expose play/pause/seek/mute to parent via ref
+  // expose play/pause/seek/mute to parent via ref
   useImperativeHandle(ref, () => ({
     controlYouTube: (action) => {
       if (!ytPlayer.current?.playVideo) return;

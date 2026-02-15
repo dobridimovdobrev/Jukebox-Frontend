@@ -15,6 +15,7 @@ const SongTableView = ({
   loadMoreRef,
   hasMore,
   loadingMore,
+  isAdmin,
 }) => {
   return (
     <div className="table-container">
@@ -29,19 +30,19 @@ const SongTableView = ({
             <th>Year</th>
             <th>Country</th>
             <th>Played</th>
-            <th>Actions</th>
+            {isAdmin && <th>Actions</th>}
           </tr>
         </thead>
         <tbody>
           {loading ? (
             <tr>
-              <td colSpan="9" className="text-center">
+              <td colSpan={isAdmin ? 9 : 8} className="text-center">
                 Loading...
               </td>
             </tr>
           ) : songs.length === 0 ? (
             <tr>
-              <td colSpan="9" className="text-center">
+              <td colSpan={isAdmin ? 9 : 8} className="text-center">
                 No songs found.
               </td>
             </tr>
@@ -49,7 +50,7 @@ const SongTableView = ({
             <>
               {songs.map((song, index) => (
                 <tr
-                  key={song.songId}
+                  key={song.songId ?? `s-${index}`}
                   ref={index === songs.length - 1 ? loadMoreRef : null}
                 >
                   <td className="col-number">{index + 1}</td>
@@ -66,29 +67,19 @@ const SongTableView = ({
                   <td>{song.releaseYear}</td>
                   <td>{song.countryCode}</td>
                   <td className="song-played">{song.songsPlayed || 0}</td>
-                  <td>
-                    <div className="table-actions">
-                      <button
-                        className="btn-icon"
-                        onClick={() => onEdit(song)}
-                        title="Edit"
-                      >
-                        ✏️
-                      </button>
-                      <button
-                        className="btn-icon btn-icon--danger"
-                        onClick={() => onDelete(song)}
-                        title="Delete"
-                      >
-                        🗑️
-                      </button>
-                    </div>
-                  </td>
+                  {isAdmin && (
+                    <td>
+                      <div className="table-actions">
+                        <button className="btn-icon" onClick={() => onEdit(song)} title="Edit">✏️</button>
+                        <button className="btn-icon btn-icon--danger" onClick={() => onDelete(song)} title="Delete">🗑️</button>
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))}
               {loadingMore && hasMore && (
                 <tr>
-                  <td colSpan="9" className="text-center loading-more">
+                  <td colSpan={isAdmin ? 9 : 8} className="text-center loading-more">
                     Loading...
                   </td>
                 </tr>

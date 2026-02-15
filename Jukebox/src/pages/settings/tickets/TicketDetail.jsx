@@ -3,27 +3,27 @@ import { useOutletContext, useParams } from "react-router-dom";
 import ticketService from "@/services/ticketService";
 import compressImage from "@/utils/compressImage";
 import uploadService from "@/services/uploadService";
-
+// ticket system transitions
 const TRANSITIONS = {
   open: ["in_progress", "closed"],
   in_progress: ["answered", "closed"],
   answered: ["in_progress", "closed"],
   closed: [],
 };
-
+// all status for my ticket system
 const STATUS_LABELS = {
   open: "Open",
   in_progress: "In Progress",
   answered: "Answered",
   closed: "Closed",
 };
-
+// ticket priority labels
 const PRIORITY_LABELS = {
   low: "Low",
   medium: "Medium",
   high: "High",
 };
-
+// date of ticket creation
 const formatDateTime = (dateStr) => {
   const d = new Date(dateStr);
   return d.toLocaleDateString("en-GB", {
@@ -57,7 +57,7 @@ const mapBackendTicket = (t) => ({
     date: h.date,
   })),
 });
-
+  // ticket details
 const TicketDetail = () => {
   const { currentRole, onAdminAction, onCancel, onRefresh } = useOutletContext();
   const { id } = useParams();
@@ -98,7 +98,7 @@ const TicketDetail = () => {
       </div>
     );
   }
-
+  // manage message when no tickets found
   if (!ticket) {
     return (
       <div className="ticket-detail">
@@ -109,7 +109,7 @@ const TicketDetail = () => {
       </div>
     );
   }
-
+  // validation ans states ticket system
   const validTransitions = TRANSITIONS[ticket.status] || [];
   const isAdmin = currentRole === "admin";
   const isClosed = ticket.status === "closed";
@@ -348,7 +348,7 @@ const TicketDetail = () => {
                 </button>
               </div>
             )}
-
+            {/* ticket status label */}
             <div className="ticket-detail__respond-footer">
               {validTransitions.length > 0 && (
                 <div className="ticket-detail__status-inline">
@@ -422,7 +422,7 @@ const TicketDetail = () => {
                 </button>
               </div>
             )}
-
+              {/* atch image only jpg and png formats uploaded to my backend */}
             <div className="ticket-detail__respond-footer">
               <div className="ticket-detail__respond-buttons">
                 <label className="ticket-detail__file-label">
@@ -447,7 +447,7 @@ const TicketDetail = () => {
           </div>
         </div>
       )}
-
+        {/*  info message on closed ticket */}
       {isClosed && (
         <div className="ticket-detail__closed-notice">
           This ticket is closed. No further actions are available.

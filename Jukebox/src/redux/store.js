@@ -4,10 +4,8 @@ import playerReducer from "./playerSlice";
 import userService from "@/services/userService";
 import songService from "@/services/songService";
 
-// actions
 const PLAY_ACTIONS = ["player/playSong", "player/nextSong", "player/prevSong"];
 
-// adding this middleware to call backend spendcoins and incrplaycount on play
 const playSyncMiddleware = (store) => (next) => (action) => {
   const prevCoins = store.getState().player.coins;
   const result = next(action);
@@ -27,7 +25,6 @@ const playSyncMiddleware = (store) => (next) => (action) => {
   return result;
 };
 
-// store
 const store = configureStore({
   reducer: {
     auth: authReducer,

@@ -7,12 +7,12 @@ const ADMIN_ONLY_TABS = ["dashboard", "quiz", "users"];
 const ALL_TABS = [
   { id: "dashboard", label: "Dashboard", path: "/settings/dashboard" },
   { id: "quiz", label: "Quiz", path: "/settings/quiz" },
-  { id: "profile", label: "Profile", path: "/settings/profile" },
   { id: "artists", label: "Artists", path: "/settings/artists" },
   { id: "songs", label: "Songs", path: "/settings/songs" },
   { id: "playlist", label: "Playlists", path: "/settings/playlists" },
   { id: "users", label: "Users", path: "/settings/users" },
   { id: "tickets", label: "Tickets", path: "/settings/tickets" },
+  { id: "profile", label: "Profile", path: "/settings/profile" },
 ];
 
 const ADMIN_ROLES = ["SuperAdmin"];
@@ -30,7 +30,10 @@ const SettingsContent = () => {
       <div className="settings-content__top d-flex justify-content-between align-items-center">
         {/*Top Greeting */}
         <h1 className="settings-content__greeting m-0">
-          Hi, {user?.firstName}
+          Hi, {user?.firstName}{" "}
+          <span className="settings-content__role">
+            ({isAdmin ? "Admin" : "User"})
+          </span>
         </h1>
 
         {/* Top navigation */}
@@ -52,7 +55,7 @@ const SettingsContent = () => {
         </nav>
       </div>
 
-      {/* Main Content - rendering child or sub routes trough Outlet */}
+      {/* Main Content - rendering child or sub routes trough Outlet , i do this beacause i have 180 deg rotation*/}
       <div className="settings-content__main">
         {/* dashboard,quiz,artists, etc... */}
         <Outlet />
