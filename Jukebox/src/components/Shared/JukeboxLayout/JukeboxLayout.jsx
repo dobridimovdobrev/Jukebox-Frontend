@@ -164,9 +164,15 @@ const JukeboxLayout = () => {
   const handleStartWizard = () => {
     openOverlay(() => setIsWizardActive(true));
   };
-
+  // playlist close
   const handleCloseWizard = () => {
     setIsWizardActive(false);
+  };
+
+  //open playlsit
+  const handleWizardViewPlaylists = () => {
+    setIsWizardActive(false);
+    openOverlay(() => setIsPlaylistOpen(true));
   };
 
   // confirm message on logout
@@ -258,6 +264,7 @@ const JukeboxLayout = () => {
               isWizardActive={isWizardActive}
               onStartWizard={handleStartWizard}
               onCloseWizard={handleCloseWizard}
+              onWizardViewPlaylists={handleWizardViewPlaylists}
               isPlaylistOpen={isPlaylistOpen}
               onClosePlaylist={() => setIsPlaylistOpen(false)}
               isLogoutOpen={isLogoutOpen}

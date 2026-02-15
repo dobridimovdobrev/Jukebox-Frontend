@@ -26,7 +26,7 @@ const HomeContent = ({
   isPlaying, showVideo, playerRef, isQuizShaking,
   coins, onAddCoins, isQuizActive, onStartQuiz, onCloseQuiz,
   isWizardActive, onStartWizard, onCloseWizard,
-  isPlaylistOpen, onClosePlaylist,
+  onWizardViewPlaylists,isPlaylistOpen, onClosePlaylist,
   isLogoutOpen, onLogoutConfirm, onLogoutCancel,
 }) => {
   return (
@@ -59,8 +59,9 @@ const HomeContent = ({
           <PlaylistWizard
             isActive={isWizardActive}
             onClose={onCloseWizard}
+            onViewPlaylists={onWizardViewPlaylists}
           />
-          {/* Playlist Panel overlay (toggled by IoList button) */}
+          {/* Playlist Panel overlay  */}
           <PlaylistPanel
             isActive={isPlaylistOpen}
             onClose={onClosePlaylist}

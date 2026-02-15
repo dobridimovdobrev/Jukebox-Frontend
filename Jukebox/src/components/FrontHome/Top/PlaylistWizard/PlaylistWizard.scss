@@ -84,6 +84,14 @@
     margin: 0;
     text-align: center;
   }
+  // playlist icon 
+  &__inline-icon {
+    display: inline-block;
+    vertical-align: middle;
+    font-size: 1.1rem;
+    color: $gold;
+    margin: 0 0.15rem;
+  }
 
   // back link
   &__back-link {

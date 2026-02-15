@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { IoList } from "react-icons/io5";
 import {
   pause,
   setSongs,
@@ -12,7 +13,7 @@ import playlistService from "@/services/playlistService";
 import artistService from "@/services/artistService";
 import vinylBg from "@/assets/new-vinyl-background.webp";
 
-const PlaylistWizard = ({ isActive, onClose }) => {
+const PlaylistWizard = ({ isActive, onClose, onViewPlaylists  }) => {
   const dispatch = useDispatch();
   const isPlaying = useSelector((s) => s.player.isPlaying);
 
@@ -474,14 +475,15 @@ const PlaylistWizard = ({ isActive, onClose }) => {
         </span>
       </div>
       <p className="playlist-wizard__subtitle">
-        Songs are now in your jukebox. Click a song to play!
+        Activate your playlist via the <IoList className="playlist-wizard__inline-icon" /> icon
       </p>
       <div className="playlist-wizard__actions playlist-wizard__actions--center">
+        {/* open the playlist panel in the video player */}
         <button
           className="playlist-wizard__btn playlist-wizard__btn--proceed"
-          onClick={handleClose}
+          onClick={onViewPlaylists}
         >
-          Back to Jukebox
+          View Playlists
         </button>
       </div>
     </div>
