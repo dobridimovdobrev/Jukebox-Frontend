@@ -61,85 +61,86 @@
   font-size: 0.8rem;
 }
 
-// Form: artist rows
-.playlists-form__artist-row {
-  display: flex;
-  align-items: flex-end;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
-  padding: 0.75rem;
-  background: rgba($primary, 0.05);
-  border-radius: 6px;
-  border: 1px solid rgba($primary, 0.15);
-}
+// Form
+.playlists-form {
+  &__artist-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    padding: 0.75rem;
+    background: rgba($primary, 0.05);
+    border-radius: 6px;
+    border: 1px solid rgba($primary, 0.15);
+  }
 
-.playlists-form__artist-select {
-  flex: 1;
-  min-width: 180px;
-}
+  &__artist-select {
+    flex: 1;
+    min-width: 180px;
+  }
 
-.playlists-form__year-range {
-  display: flex;
-  align-items: flex-end;
-  gap: 0.5rem;
-}
+  &__year-range {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+  }
 
-.playlists-form__year-field {
-  min-width: 90px;
-}
+  &__year-field {
+    min-width: 90px;
+  }
 
-.playlists-form__year-separator {
-  color: $gold;
-  font-size: 1.1rem;
-  padding-bottom: 0.5rem;
-}
+  &__year-separator {
+    color: $gold;
+    font-size: 1.1rem;
+    padding-bottom: 0.5rem;
+  }
 
-.playlists-form__remove-artist {
-  background: none;
-  border: 1px solid rgba(#dc3545, 0.4);
-  color: #dc3545;
-  font-size: 1.2rem;
-  width: 32px;
-  height: 32px;
-  border-radius: 4px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 0.25rem;
-  transition: all 0.2s;
+  &__remove-artist {
+    background: none;
+    border: 1px solid rgba(#dc3545, 0.4);
+    color: #dc3545;
+    font-size: 1.2rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
 
-  &:hover {
-    background: rgba(#dc3545, 0.15);
-    border-color: #dc3545;
+    &:hover {
+      background: rgba(#dc3545, 0.15);
+      border-color: #dc3545;
+    }
+  }
+
+  &__add-artist {
+    background: none;
+    border: 1px dashed rgba($primary, 0.5);
+    color: $gold;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+    transition: all 0.2s;
+
+    &:hover {
+      background: rgba($primary, 0.1);
+      border-color: $primary;
+    }
+  }
+
+  &__songs-info {
+    font-size: 0.8rem;
+    color: $gold;
+    opacity: 0.7;
+    margin-top: 0.35rem;
   }
 }
 
-.playlists-form__add-artist {
-  background: none;
-  border: 1px dashed rgba($primary, 0.5);
-  color: $gold;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  margin-bottom: 1rem;
-  transition: all 0.2s;
-
-  &:hover {
-    background: rgba($primary, 0.1);
-    border-color: $primary;
-  }
-}
-
-.playlists-form__songs-info {
-  font-size: 0.8rem;
-  color: $gold;
-  opacity: 0.7;
-  margin-top: 0.35rem;
-}
-
-// Responsive
+// responsive
 @media (max-width: 768px) {
   .playlists {
     &__header {
@@ -170,16 +171,18 @@
     }
   }
 
-  .playlists-form__artist-row {
-    flex-direction: column;
-    align-items: stretch;
-  }
+  .playlists-form {
+    &__artist-row {
+      flex-direction: column;
+      align-items: stretch;
+    }
 
-  .playlists-form__year-range {
-    flex-wrap: wrap;
-  }
+    &__year-range {
+      flex-wrap: wrap;
+    }
 
-  .playlists-form__remove-artist {
-    align-self: flex-end;
+    &__remove-artist {
+      align-self: flex-end;
+    }
   }
 }
