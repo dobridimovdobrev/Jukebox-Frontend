@@ -133,11 +133,15 @@ const PlaylistWizard = ({ isActive, onClose }) => {
     dispatch(setGenerating(true));
 
     // fake progress for now to 99% over ~20s in future i wil sync with bakcend playlist generation
+   // fake progress to 99% — speed adapts to number of artists selected
+    // 1 artist ~20s, 2 ~40s, 3 ~60s, 4 ~120s, 5 ~150s, i choose this values, after my tests
+    const progressSpeed = { 1: 0.08, 2: 0.04, 3: 0.026, 4: 0.013, 5: 0.011 };
+    const factor = progressSpeed[selectedArtists.length] || 0.08;
     const fakeInterval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 99) return 99;
         const remaining = 99 - prev;
-        return prev + remaining * 0.08;
+        return prev + remaining * factor;
       });
     }, 300);
 
