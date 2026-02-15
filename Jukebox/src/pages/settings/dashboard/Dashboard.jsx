@@ -16,13 +16,13 @@ const Dashboard = () => {
           dashboardService.getStats(),
           playlistService.search({ pageNumber: 1, pageSize: 10 }),
         ]);
-
+        /* real statistics in the dashboard page for admin role */
         setStats([
-          { label: "Artists", value: dashStats.artists },
-          { label: "Total Songs", value: dashStats.songs },
-          { label: "Playlists", value: dashStats.playlists },
-          { label: "Quiz Questions", value: dashStats.quizzes },
-          { label: "Users", value: dashStats.users },
+          { label: "Artists", value: dashStats.totalArtists },
+          { label: "Total Songs", value: dashStats.totalSongs },
+          { label: "Playlists", value: dashStats.totalPlaylists },
+          { label: "Quiz Questions", value: dashStats.totalQuizzes },
+          { label: "Users", value: dashStats.totalUsers },
         ]);
 
         setRecentPlaylists(playlistData.items || []);

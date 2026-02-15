@@ -35,13 +35,16 @@
     border-color: $gold;
     transform: translateY(-2px);
   }
-
+  // dashboard bage for page statistics
   &__value {
-    display: block;
+   display: inline-block;
     font-size: 1.3rem;
     font-weight: 700;
-    color: $gold;
+    color: #5fdd77;
     line-height: 1;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.2rem 0.6rem;
+    border-radius: 10px;
   }
 
   &__label {

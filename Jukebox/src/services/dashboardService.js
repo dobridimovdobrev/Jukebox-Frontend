@@ -1,22 +1,23 @@
 import api from "./api";
-
+// real statistics for superadmin role in the dashboard page of settings/backoffice
 const dashboardService = {
   getStats: async () => {
     try {
+      const params = { pageSize: 1 };
       const [artists, songs, playlists, quizzes, users] = await Promise.all([
-        api.get("/artist", { params: { pageSize: 1 } }),
-        api.get("/song", { params: { pageSize: 1 } }),
-        api.get("/playlist"),
-        api.get("/quiz"),
-        api.get("/user"),
+        api.get("/artist", { params }),
+        api.get("/song", { params }),
+        api.get("/playlist", { params }),
+        api.get("/quiz", { params }),
+        api.get("/user", { params }),
       ]);
 
       return {
-        totalArtists: artists.data.totalItems || artists.data.length || 0,
-        totalSongs: songs.data.totalItems || songs.data.length || 0,
-        totalPlaylists: Array.isArray(playlists.data) ? playlists.data.length : 0,
-        totalQuizzes: Array.isArray(quizzes.data) ? quizzes.data.length : 0,
-        totalUsers: Array.isArray(users.data) ? users.data.length : 0,
+        totalArtists: artists.data.totalItems || 0,
+        totalSongs: songs.data.totalItems || 0,
+        totalPlaylists: playlists.data.totalItems || 0,
+        totalQuizzes: quizzes.data.totalItems || 0,
+        totalUsers: users.data.totalItems || 0,
       };
     } catch (error) {
       console.error("Dashboard stats error:", error);
