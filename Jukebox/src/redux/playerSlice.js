@@ -8,7 +8,7 @@ const initialState = {
   isPlaying: false,
   showVideo: false,
 
-  //song list 
+  //song list
   songs: [],
   activePlaylistId: null,
   activeArtistId: null,
@@ -38,7 +38,7 @@ const playerSlice = createSlice({
   name: "player",
   initialState,
   reducers: {
-    //set songs in the song list 
+    //set songs in the song list
     setSongs: (state, action) => {
       state.songs = action.payload;
       state.currentIndex = 0;
@@ -46,9 +46,21 @@ const playerSlice = createSlice({
       state.isPlaying = false;
     },
 
+    //select song without playing or spending coins
+    selectSong: (state, action) => {
+      const { song, index } = action.payload;
+      state.currentSong = song;
+      state.currentIndex = index;
+    },
+
     //play a specific song 1 coin cost
     playSong: (state, action) => {
       const { song, index } = action.payload;
+      // same song clicked,play/pause, no coin
+      if (state.currentSong?.songId === song.songId) {
+        state.isPlaying = !state.isPlaying;
+        return;
+      }
       if (state.coins <= 0) {
         state.noCoinAttempt += 1;
         return;
@@ -94,9 +106,10 @@ const playerSlice = createSlice({
         state.noCoinAttempt += 1;
         return;
       }
-      const prev = state.currentIndex === 0
-        ? state.songs.length - 1
-        : state.currentIndex - 1;
+      const prev =
+        state.currentIndex === 0
+          ? state.songs.length - 1
+          : state.currentIndex - 1;
       state.currentIndex = prev;
       state.currentSong = state.songs[prev];
       state.isPlaying = true;

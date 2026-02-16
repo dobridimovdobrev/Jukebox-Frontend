@@ -7,7 +7,6 @@ import {
   prevSong,
   syncProfile,
   addCoins as addCoinsAction,
-  spendCoin,
   setShowVideo as setShowVideoAction,
   setPlaylists,
 } from "@/redux/playerSlice";
@@ -190,15 +189,6 @@ const JukeboxLayout = () => {
   // audio video controls for the player
   const handlePlayPause = () => {
     if (!currentSong) return;
-    if (!isPlaying && coins <= 0) {
-      // shake naimation
-      setIsQuizShaking(true);
-      setTimeout(() => setIsQuizShaking(false), 500);
-      return;
-    }
-    if (!isPlaying) {
-      dispatch(spendCoin());
-    }
     dispatch(togglePlay());
   };
 

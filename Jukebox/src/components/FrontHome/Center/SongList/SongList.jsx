@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { playSong } from "@/redux/playerSlice";
 import useInfiniteScroll from "@/hooks/useInfiniteScroll";
-import songService from "@/services/songService";
 
 const cleanTitle = (title) => title.replace(/["()'/]/g, "").replace(/\s+/g, " ").trim();
 
@@ -43,11 +42,6 @@ const SongList = () => {
   const handleSongClick = (song, index) => {
     if (isGenerating) return;
     dispatch(playSong({ song, index }));
-    if (coins > 0) {
-      songService.incrementPlayCount(song.songId).catch((err) => {
-        console.error("Failed to increment play count:", err);
-      });
-    }
   };
 
   if (songs.length === 0 && !isGenerating) {
